@@ -1,85 +1,11 @@
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types.js';
-import { GraphQLClient, gql } from 'graphql-request';
+import { MENU_ITEM_LISTING_QUERY } from '../api/gql/menuQueries.js';
+import { createGraphQLClient } from '../api/graphqlClient.js';
 import { MenuItemListingResponse } from '../types/menuTypes.js';
 
 interface Tool extends McpTool {
   handler: () => Promise<{ content: { type: 'text'; text: string }[] }>;
 }
-
-const endpoint = 'http://localhost:8026/api/graphql/';
-const token = '0d74c19882535498d2d19e58433c1527944e2535';
-// GraphQL 客戶端設定
-const createGraphQLClient = () => {
-  if (!endpoint) {
-    throw new Error('GRAPHQL_ENDPOINT environment variable is not set');
-  }
-
-  if (!token) {
-    throw new Error('GRAPHQL_TOKEN environment variable is not set');
-  }
-
-  return new GraphQLClient(endpoint, {
-    headers: {
-      Authorization: `token ${token}`,
-      'Content-Type': 'application/json',
-    },
-  });
-};
-
-// GraphQL 查詢語句
-const MENU_ITEM_LISTING_QUERY = gql`
-  query menuItemListingQuery {
-    restaurant {
-      settings {
-        menu {
-          menuItemCategories {
-            ...menuItemCategoryBasicFields
-            menuItems {
-              ...menuItemitemBasicFields
-              __typename
-            }
-            __typename
-          }
-          __typename
-        }
-        __typename
-      }
-      __typename
-    }
-  }
-
-  fragment menuItemCategoryBasicFields on MenuItemCategoryType {
-    _id: uuid
-    uuid
-    name
-    sortingIndex
-    isFromHq
-    __typename
-  }
-
-  fragment menuItemitemBasicFields on MenuItemType {
-    _id: uuid
-    uuid
-    name
-    price
-    type
-    sortingIndex
-    enabled
-    isIncomplete
-    menuItemCategoryUuid
-    isFromHq
-    picture
-    comboItemCategoryUuidsMappedWithOnlineOrdering {
-      ubereats
-      __typename
-    }
-    onlineRestaurantMenuItem {
-      uuid
-      __typename
-    }
-    __typename
-  }
-`;
 
 // 格式化菜單資料的輔助函數
 const formatMenuData = (data: MenuItemListingResponse): string => {
