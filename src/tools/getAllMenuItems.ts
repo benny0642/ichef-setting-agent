@@ -1,60 +1,186 @@
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types.js';
 import { GraphQLClient, gql } from 'graphql-request';
+import { MenuItemListingResponse } from '../types/menuTypes.js';
 
 interface Tool extends McpTool {
   handler: () => Promise<{ content: { type: 'text'; text: string }[] }>;
 }
 
+const endpoint = 'http://localhost:8026/api/graphql/';
+const token = '0d74c19882535498d2d19e58433c1527944e2535';
 // GraphQL 客戶端設定
-const client = new GraphQLClient('YOUR_GRAPHQL_ENDPOINT_HERE', {
-  headers: {
-    // 如果需要認證，可以在這裡加入 headers
-    // 'Authorization': 'Bearer YOUR_TOKEN_HERE',
-    'Content-Type': 'application/json',
-  },
-});
+const createGraphQLClient = () => {
+  if (!endpoint) {
+    throw new Error('GRAPHQL_ENDPOINT environment variable is not set');
+  }
+
+  if (!token) {
+    throw new Error('GRAPHQL_TOKEN environment variable is not set');
+  }
+
+  return new GraphQLClient(endpoint, {
+    headers: {
+      Authorization: `token ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+};
 
 // GraphQL 查詢語句
-const GET_ALL_MENU_ITEMS = gql`
-  query GetAllMenuItems {
-    menuItems {
-      id
-      name
-      description
-      price
-      category
-      available
+const MENU_ITEM_LISTING_QUERY = gql`
+  query menuItemListingQuery {
+    restaurant {
+      settings {
+        menu {
+          menuItemCategories {
+            ...menuItemCategoryBasicFields
+            menuItems {
+              ...menuItemitemBasicFields
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      __typename
     }
+  }
+
+  fragment menuItemCategoryBasicFields on MenuItemCategoryType {
+    _id: uuid
+    uuid
+    name
+    sortingIndex
+    isFromHq
+    __typename
+  }
+
+  fragment menuItemitemBasicFields on MenuItemType {
+    _id: uuid
+    uuid
+    name
+    price
+    type
+    sortingIndex
+    enabled
+    isIncomplete
+    menuItemCategoryUuid
+    isFromHq
+    picture
+    comboItemCategoryUuidsMappedWithOnlineOrdering {
+      ubereats
+      __typename
+    }
+    onlineRestaurantMenuItem {
+      uuid
+      __typename
+    }
+    __typename
   }
 `;
 
+// 格式化菜單資料的輔助函數
+const formatMenuData = (data: MenuItemListingResponse): string => {
+  const categories = data.restaurant.settings.menu.menuItemCategories;
+
+  let result = '📋 餐廳菜單項目\n\n';
+
+  categories.forEach((category, categoryIndex) => {
+    result += `## ${category.name} (分類 ${categoryIndex + 1})\n`;
+    result += `- 分類 ID: ${category.uuid}\n`;
+    result += `- 排序索引: ${category.sortingIndex}\n`;
+    result += `- 來自總部: ${category.isFromHq ? '是' : '否'}\n`;
+    result += `- 菜單項目數量: ${category.menuItems.length}\n\n`;
+
+    if (category.menuItems.length > 0) {
+      result += '### 菜單項目:\n';
+      category.menuItems.forEach((item, itemIndex) => {
+        result += `${itemIndex + 1}. **${item.name}**\n`;
+        result += `   - 價格: $${item.price}\n`;
+        result += `   - 類型: ${item.type}\n`;
+        result += `   - 啟用狀態: ${item.enabled ? '啟用' : '停用'}\n`;
+        result += `   - 完整性: ${item.isIncomplete ? '不完整' : '完整'}\n`;
+        result += `   - UUID: ${item.uuid}\n`;
+        if (item.picture) {
+          result += `   - 圖片: ${item.picture}\n`;
+        }
+        result += '\n';
+      });
+    } else {
+      result += '   (此分類暫無菜單項目)\n';
+    }
+
+    result += '\n---\n\n';
+  });
+
+  return result;
+};
+
 export const getAllMenuItems: Tool = {
   name: 'getAllMenuItems',
-  description: 'Get all menu items from GraphQL API',
+  description:
+    'Get all menu items from GraphQL API with categories and detailed information',
   inputSchema: {
     type: 'object',
     properties: {},
   },
   handler: async () => {
     try {
+      // 建立 GraphQL 客戶端
+      const client = createGraphQLClient();
+
       // 發送 GraphQL 請求
-      const data = await client.request(GET_ALL_MENU_ITEMS);
+      const data = await client.request<MenuItemListingResponse>(
+        MENU_ITEM_LISTING_QUERY
+      );
+
+      // 格式化回應資料
+      const formattedData = formatMenuData(data);
 
       return {
         content: [
           {
             type: 'text',
-            text: JSON.stringify(data, null, 2),
+            text: formattedData,
           },
         ],
       };
     } catch (error) {
-      // 錯誤處理
+      // 詳細的錯誤處理
+      let errorMessage = 'Unknown error occurred';
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      // 根據不同錯誤類型提供不同的錯誤訊息
+      if (errorMessage.includes('GRAPHQL_ENDPOINT')) {
+        errorMessage =
+          '❌ GraphQL 端點未設定，請檢查 .env 檔案中的 GRAPHQL_ENDPOINT';
+      } else if (errorMessage.includes('GRAPHQL_TOKEN')) {
+        errorMessage =
+          '❌ GraphQL Token 未設定，請檢查 .env 檔案中的 GRAPHQL_TOKEN';
+      } else if (errorMessage.includes('fetch')) {
+        errorMessage = `❌ 網路連線錯誤，請確認 API 端點是否正確: ${process.env.GRAPHQL_ENDPOINT}`;
+      } else if (
+        errorMessage.includes('401') ||
+        errorMessage.includes('Unauthorized')
+      ) {
+        errorMessage = '❌ 認證失敗，請檢查 Token 是否正確';
+      } else if (
+        errorMessage.includes('400') ||
+        errorMessage.includes('Bad Request')
+      ) {
+        errorMessage = '❌ GraphQL 查詢語法錯誤';
+      }
+
       return {
         content: [
           {
             type: 'text',
-            text: `Error fetching menu items: ${error.message}`,
+            text: `🚨 取得菜單項目時發生錯誤:\n\n${errorMessage}\n\n原始錯誤: ${error}`,
           },
         ],
       };
