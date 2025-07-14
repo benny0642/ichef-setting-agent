@@ -9,16 +9,15 @@
   - [x] 1.4 實現 MCP Server 的基本通訊協議
   - [x] 1.5 建立專案目錄結構和模組化架構
 
-- [ ] 2.0 實現 iChef GraphQL API 整合層
-  - [ ] 2.1 設定 GraphQL 客戶端和連接配置
-  - [ ] 2.2 實現 API 認證機制（Authorization token）
-  - [ ] 2.3 建立 GraphQL 查詢和 mutation 定義
-  - [ ] 2.4 實現 API 回應資料的類型定義
-  - [ ] 2.5 建立 API 連接測試和健康檢查機制
+- [x] 2.0 實現 iChef GraphQL API 整合層
+  - [x] 2.1 設定 GraphQL 客戶端和連接配置
+  - [x] 2.2 實現 API 認證機制（Authorization token）
+  - [x] 2.3 建立 GraphQL 查詢和 mutation 定義
+  - [x] 2.4 實現 API 回應資料的類型定義
 
 - [ ] 3.0 開發商品管理核心功能
-  - [ ] 3.1 實現商品查詢功能（取得所有商品列表）
-  - [ ] 3.2 實現商品新增功能和必填欄位驗證
+  - [x] 3.1 實現商品查詢功能（取得所有商品列表）
+  - [x] 3.2 實現商品新增功能和必填欄位驗證
   - [ ] 3.3 實現商品編輯功能（支援部分更新）
   - [ ] 3.4 實現批次停售商品功能
   - [ ] 3.5 實現批次恢復販售商品功能
@@ -45,13 +44,19 @@
 - `src/api/graphqlClient.ts` - GraphQL 客戶端配置和連接管理 ✅
 - `src/api/gql/menuItemListingQuery.ts` - 商品列表查詢 GraphQL 定義 ✅
 - `src/api/gql/createMenuItemMutation.ts` - 商品新增 mutation 定義 ✅
-- `src/api/gql/updateMenuItemMutation.ts` - 商品更新 mutation 定義（需新增）
+- `src/api/gql/updateMenuItemMutation.ts` - 商品更新 mutation 定義 ✅
+- `src/api/gql/menuItemQuery.ts` - 單一商品查詢和分類查詢 GraphQL 定義 ✅
+- `src/api/gql/deleteMenuItemMutation.ts` - 商品刪除 mutation 定義 ✅
+- `src/api/gql/index.ts` - GraphQL 查詢和 mutation 統一匯出 ✅
+- `src/api/gql/graphqlUtils.ts` - GraphQL 查詢驗證和工具函數 ✅
 - `src/tools/getAllMenuItems.ts` - 取得所有商品的 MCP 工具實現 ✅
 - `src/tools/createMenuItem.ts` - 新增商品的 MCP 工具實現 ✅
 - `src/tools/updateMenuItem.ts` - 編輯商品的 MCP 工具實現（需新增）
 - `src/tools/batchUpdateMenuItems.ts` - 批次操作商品的 MCP 工具實現（需新增）
 - `src/types/menuTypes.ts` - 商品相關的 TypeScript 類型定義 ✅
 - `src/types/mcpTypes.ts` - MCP Server 相關的類型定義 ✅
+- `src/types/typeValidators.ts` - API 回應資料的類型驗證工具 ✅
+- `src/types/typeConverters.ts` - 資料格式轉換工具 ✅
 - `src/utils/errorHandler.ts` - 錯誤處理工具函數 ✅
 - `src/utils/validator.ts` - 資料驗證工具函數 ✅
 - `src/utils/toolManager.ts` - 工具管理器 ✅

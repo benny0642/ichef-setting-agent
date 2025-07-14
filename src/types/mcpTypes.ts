@@ -22,13 +22,6 @@ export interface McpToolContent {
 
 // 擴展的 MCP 工具介面
 export interface IChefMcpTool extends McpTool {
-  name: string;
-  description: string;
-  inputSchema: {
-    type: 'object';
-    properties: Record<string, unknown>;
-    required?: string[];
-  };
   handler: McpToolHandler;
   category?: 'menu' | 'item' | 'batch' | 'system';
   version?: string;

@@ -1,5 +1,9 @@
-// GraphQL 查詢語句
-export const MENU_ITEM_LISTING_QUERY = `
+import { gql } from 'graphql-request';
+
+/**
+ * 查詢所有商品列表的 GraphQL Query
+ */
+export const MENU_ITEM_LISTING_QUERY = gql`
   query menuItemListingQuery {
     restaurant {
       settings {

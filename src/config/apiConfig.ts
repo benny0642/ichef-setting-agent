@@ -84,10 +84,19 @@ export function validateConfig(): {
     );
   }
 
+  // 強制要求 GRAPHQL_TOKEN，不允許空值
   if (!process.env.GRAPHQL_TOKEN) {
-    warnings.push(
-      'GRAPHQL_TOKEN not set, API requests may require authentication'
+    errors.push(
+      'GRAPHQL_TOKEN is required and must be provided via environment variable or MCP parameters'
     );
+  } else {
+    // 驗證 token 格式（基本檢查）
+    const token = process.env.GRAPHQL_TOKEN.trim();
+    if (token.length === 0) {
+      errors.push('GRAPHQL_TOKEN cannot be empty');
+    } else if (token.length < 10) {
+      warnings.push('GRAPHQL_TOKEN appears to be too short, please verify');
+    }
   }
 
   // 檢查數值型環境變數
@@ -125,6 +134,67 @@ export function validateConfig(): {
 }
 
 /**
+ * 驗證認證 token 的有效性
+ */
+export function validateAuthToken(token?: string): {
+  isValid: boolean;
+  error?: string;
+} {
+  if (!token) {
+    return {
+      isValid: false,
+      error: 'Authentication token is required',
+    };
+  }
+
+  const trimmedToken = token.trim();
+
+  if (trimmedToken.length === 0) {
+    return {
+      isValid: false,
+      error: 'Authentication token cannot be empty',
+    };
+  }
+
+  if (trimmedToken.length < 10) {
+    return {
+      isValid: false,
+      error: 'Authentication token appears to be invalid (too short)',
+    };
+  }
+
+  // 檢查是否包含不安全的字符
+  if (
+    trimmedToken.includes(' ') ||
+    trimmedToken.includes('\n') ||
+    trimmedToken.includes('\t')
+  ) {
+    return {
+      isValid: false,
+      error: 'Authentication token contains invalid characters',
+    };
+  }
+
+  return {
+    isValid: true,
+  };
+}
+
+/**
+ * 安全地取得認證 token
+ */
+export function getAuthToken(): string {
+  const token = process.env.GRAPHQL_TOKEN;
+  const validation = validateAuthToken(token);
+
+  if (!validation.isValid) {
+    throw new Error(`Authentication error: ${validation.error}`);
+  }
+
+  return token!.trim();
+}
+
+/**
  * 取得完整的配置資訊
  */
 export function getFullConfig() {
@@ -143,6 +213,9 @@ export function getEnvExample(): string {
 
 # GraphQL API 設定
 GRAPHQL_ENDPOINT=http://localhost:8026/api/graphql/
+
+# 認證 Token (必填) - 請從 iChef 系統取得有效的 API Token
+# 注意：此 Token 應該保密，不要提交到版本控制系統
 GRAPHQL_TOKEN=your-api-token-here
 
 # API 連接設定
@@ -155,5 +228,10 @@ SERVER_NAME=ichef-setting-agent
 SERVER_VERSION=1.0.1
 LOG_LEVEL=info
 NODE_ENV=development
+
+# 安全提醒：
+# 1. GRAPHQL_TOKEN 是必填項目，系統啟動時會驗證
+# 2. Token 應該從安全的來源取得，不要在程式碼中硬編碼
+# 3. 在生產環境中，建議使用環境變數管理工具或密鑰管理系統
 `;
 }

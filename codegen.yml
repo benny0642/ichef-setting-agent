@@ -1,0 +1,61 @@
+schema: './schema.json'
+documents: 'src/api/gql/**/*.ts'
+generates:
+  src/types/generated.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-graphql-request
+    config:
+      scalars: &scalars
+        UUID:
+          input: string
+          output: string
+        Date:
+          input: string
+          output: string
+        DateTime:
+          input: string
+          output: string
+        Time:
+          input: string
+          output: string
+        Decimal:
+          input: string
+          output: string
+        JSONString:
+          input: string
+          output: string
+        UTCDateTime:
+          input: string
+          output: string
+        AbsoluteValueDecimalStr:
+          input: string
+          output: string
+        AddPositiveSignDecimalStr:
+          input: string
+          output: string
+        ReverseNumberSignDecimalStr:
+          input: string
+          output: string
+        AllowUnicodeAndDefaultValueUUID:
+          input: string
+          output: string
+        EmptyAsNoneString:
+          input: string
+          output: string
+        DBIntToAPIBoolean:
+          input: boolean
+          output: boolean
+        StripString:
+          input: string
+          output: string
+        UUIDForText:
+          input: string
+          output: string
+        Upload:
+          input: File | Blob
+          output: File
+        Dictionary:
+          input: Record<string, any>
+          output: Record<string, any>

@@ -8,7 +8,7 @@ import {
   ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import winston from 'winston';
-import { createMenuItem } from './tools/createMenuItem.js';
+import createMenuItem from './tools/createMenuItem.js';
 import getAllMenuItems from './tools/getAllMenuItems.js';
 
 // 設定日誌記錄器 - 輸出到 stderr 避免干擾 MCP 協議

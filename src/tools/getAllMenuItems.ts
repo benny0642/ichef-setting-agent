@@ -88,16 +88,24 @@ const getAllMenuItems: IChefMcpTool = {
       if (errorMessage.includes('GRAPHQL_ENDPOINT')) {
         errorMessage =
           '❌ GraphQL 端點未設定，請檢查 .env 檔案中的 GRAPHQL_ENDPOINT';
-      } else if (errorMessage.includes('GRAPHQL_TOKEN')) {
+      } else if (
+        errorMessage.includes('GRAPHQL_TOKEN') ||
+        errorMessage.includes('Authentication')
+      ) {
         errorMessage =
-          '❌ GraphQL Token 未設定，請檢查 .env 檔案中的 GRAPHQL_TOKEN';
+          '❌ 認證 Token 未設定或無效，請檢查 .env 檔案中的 GRAPHQL_TOKEN 或透過 MCP 參數提供';
       } else if (errorMessage.includes('fetch')) {
         errorMessage = `❌ 網路連線錯誤，請確認 API 端點是否正確: ${process.env.GRAPHQL_ENDPOINT}`;
       } else if (
         errorMessage.includes('401') ||
         errorMessage.includes('Unauthorized')
       ) {
-        errorMessage = '❌ 認證失敗，請檢查 Token 是否正確';
+        errorMessage = '❌ 認證失敗，請檢查 Token 是否正確或已過期';
+      } else if (
+        errorMessage.includes('403') ||
+        errorMessage.includes('Forbidden')
+      ) {
+        errorMessage = '❌ 權限不足，請檢查 Token 是否有足夠的權限存取此 API';
       } else if (
         errorMessage.includes('400') ||
         errorMessage.includes('Bad Request')
