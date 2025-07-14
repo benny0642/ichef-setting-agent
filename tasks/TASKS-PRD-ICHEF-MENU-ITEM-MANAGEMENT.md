@@ -18,7 +18,7 @@
 - [ ] 3.0 開發商品管理核心功能
   - [x] 3.1 實現商品查詢功能（取得所有商品列表）
   - [x] 3.2 實現商品新增功能和必填欄位驗證
-  - [ ] 3.3 實現商品編輯功能（支援部分更新）
+  - [x] 3.3 實現商品編輯功能（支援部分更新）
   - [ ] 3.4 實現批次停售商品功能
   - [ ] 3.5 實現批次恢復販售商品功能
   - [ ] 3.6 建立商品資料轉換和格式化邏輯
@@ -51,7 +51,7 @@
 - `src/api/gql/graphqlUtils.ts` - GraphQL 查詢驗證和工具函數 ✅
 - `src/tools/getAllMenuItems.ts` - 取得所有商品的 MCP 工具實現 ✅
 - `src/tools/createMenuItem.ts` - 新增商品的 MCP 工具實現 ✅
-- `src/tools/updateMenuItem.ts` - 編輯商品的 MCP 工具實現（需新增）
+- `src/tools/updateMenuItem.ts` - 編輯商品的 MCP 工具實現 ✅
 - `src/tools/batchUpdateMenuItems.ts` - 批次操作商品的 MCP 工具實現（需新增）
 - `src/types/menuTypes.ts` - 商品相關的 TypeScript 類型定義 ✅
 - `src/types/mcpTypes.ts` - MCP Server 相關的類型定義 ✅
