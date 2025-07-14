@@ -11,5 +11,5 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "src/types/generated.ts.bak"]
+  "exclude": ["node_modules", "src/types/generated.ts"]
 }

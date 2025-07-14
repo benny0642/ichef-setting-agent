@@ -2,7 +2,7 @@
  * iChef API 回應的類型定義
  */
 
-// 基本 UUID 類型
+// 基本類型定義
 export type UUID = string;
 
 // 商品類型枚舉
@@ -11,45 +11,33 @@ export enum MenuItemTypeEnum {
   COMBO_ITEM = 'COMBO_ITEM',
 }
 
-// 稅務類型枚舉
+// 自訂稅務類型枚舉
 export enum CustomizedTaxType {
   PERCENTAGE = 'PERCENTAGE',
   FIXED = 'FIXED',
 }
 
-// 商品標籤排序類型
-export enum MenuItemTagSortingType {
-  MANUAL = 'MANUAL',
-  ALPHABETICAL = 'ALPHABETICAL',
-}
-
-// 組合商品排序類型
+// 套餐商品排序類型枚舉
 export enum ComboMenuItemSortingType {
   MANUAL = 'MANUAL',
   ALPHABETICAL = 'ALPHABETICAL',
 }
 
-/**
- * 線上平台商品介面
- */
+// 線上餐廳商品介面
 export interface OnlineRestaurantMenuItem {
   uuid: UUID;
   visible?: boolean;
   __typename?: string;
 }
 
-/**
- * 原始圖片資訊
- */
+// 原始圖片介面
 export interface OriginalPicture {
   uuid: UUID;
   pictureFilename: string;
   __typename?: string;
 }
 
-/**
- * 組合商品項目
- */
+// 套餐商品介面
 export interface ComboMenuItem {
   uuid: UUID;
   price: number;
@@ -60,9 +48,7 @@ export interface ComboMenuItem {
   __typename?: string;
 }
 
-/**
- * 組合商品分類
- */
+// 套餐商品分類類型
 export interface ComboItemCategoryType {
   _id: UUID;
   uuid: UUID;
@@ -78,35 +64,7 @@ export interface ComboItemCategoryType {
   __typename?: string;
 }
 
-/**
- * 商品標籤關聯
- */
-export interface MenuItemTagInItemType {
-  __typename: 'MenuItemTagInItemType';
-  menuItemTagUuid: UUID;
-}
-
-export interface SubTagInItem {
-  subTagUuid: UUID;
-  enabledInformation: {
-    subTagInItemEnabled: boolean;
-  };
-}
-
-export interface TagGroupInItemType {
-  __typename: 'TagGroupInItemType';
-  tagGroupUuid: UUID;
-  subTagInItems: SubTagInItem[];
-}
-
-export interface ItemTagRelationship {
-  followingSeparatorCount: number;
-  tagLikeObject: MenuItemTagInItemType | TagGroupInItemType;
-}
-
-/**
- * 商品分類基本資訊
- */
+// 商品分類類型
 export interface MenuItemCategoryType {
   _id: UUID;
   uuid: UUID;
@@ -117,9 +75,7 @@ export interface MenuItemCategoryType {
   __typename?: string;
 }
 
-/**
- * 商品基本資訊
- */
+// 商品類型
 export interface MenuItemType {
   _id: UUID;
   uuid: UUID;
@@ -139,7 +95,6 @@ export interface MenuItemType {
   customizedTaxEnabled?: boolean;
   customizedTaxType?: CustomizedTaxType;
   customizedTaxRate?: number;
-  menuItemTagSortingType?: MenuItemTagSortingType;
   comboItemCategoryUuidsMappedWithOnlineOrdering: {
     ubereats: string;
   };
@@ -148,13 +103,8 @@ export interface MenuItemType {
   ubereatsMenuItem?: OnlineRestaurantMenuItem;
   ubereatsV2MenuItem?: OnlineRestaurantMenuItem;
   foodpandaMenuItem?: OnlineRestaurantMenuItem;
-  itemTagRelationshipList?: ItemTagRelationship[];
   __typename?: string;
 }
-
-/**
- * API 回應類型定義
- */
 
 // 商品列表查詢回應
 export interface MenuItemListingResponse {
@@ -235,11 +185,7 @@ export interface MenuItemDeleteResponse {
   };
 }
 
-/**
- * Mutation Payload 類型定義
- */
-
-// 新增商品的 Payload
+// 新增商品 Payload
 export interface CreateMenuItemPayload {
   name: string;
   price: number;
@@ -254,7 +200,7 @@ export interface CreateMenuItemPayload {
   customizedTaxRate?: number;
 }
 
-// 更新商品的 Payload
+// 更新商品 Payload
 export interface UpdateMenuItemPayload {
   name?: string;
   price?: number;
@@ -269,9 +215,7 @@ export interface UpdateMenuItemPayload {
   customizedTaxRate?: number;
 }
 
-/**
- * 認證相關類型定義
- */
+// 認證 Token
 export interface AuthToken {
   token: string;
   expiresAt?: Date;
@@ -279,6 +223,7 @@ export interface AuthToken {
   tokenType: 'Bearer' | 'token';
 }
 
+// 認證驗證結果
 export interface AuthValidationResult {
   isValid: boolean;
   isExpired: boolean;
@@ -286,15 +231,12 @@ export interface AuthValidationResult {
   error?: string;
 }
 
+// 認證錯誤
 export interface AuthError {
   code: 'INVALID_TOKEN' | 'EXPIRED_TOKEN' | 'MISSING_TOKEN' | 'UNAUTHORIZED';
   message: string;
   details?: unknown;
 }
-
-/**
- * 工具函數類型定義
- */
 
 // 批次操作結果
 export interface BatchOperationResult {
@@ -320,4 +262,32 @@ export interface MenuItemOperationContext {
   menuItemUuid?: UUID;
   categoryUuid?: UUID;
   payload?: CreateMenuItemPayload | UpdateMenuItemPayload;
+}
+
+// 停售商品相關類型
+export interface UpdateSoldOutItemInput {
+  uuid: UUID;
+  isSoldOut: boolean;
+}
+
+export interface SoldOutMenuItem {
+  uuid: UUID;
+  isSoldOut: boolean;
+  __typename?: string;
+}
+
+export interface UpdateSoldOutMenuItemResponse {
+  restaurant: {
+    settings: {
+      menu: {
+        updateSoldOutItems: {
+          updatedSoldOutMenuItems: SoldOutMenuItem[];
+          __typename?: string;
+        };
+        __typename?: string;
+      };
+      __typename?: string;
+    };
+    __typename?: string;
+  };
 }

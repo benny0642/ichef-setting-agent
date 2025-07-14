@@ -11,6 +11,7 @@ import winston from 'winston';
 import createMenuItem from './tools/createMenuItem.js';
 import getAllMenuItems from './tools/getAllMenuItems.js';
 import updateMenuItem from './tools/updateMenuItem.js';
+import updateSoldOutMenuItem from './tools/updateSoldOutMenuItem.js';
 
 // 設定日誌記錄器 - 輸出到 stderr 避免干擾 MCP 協議
 const logger = winston.createLogger({
@@ -45,7 +46,12 @@ const server = new Server(
 );
 
 // 註冊的工具列表
-const tools = [getAllMenuItems, createMenuItem, updateMenuItem];
+const tools = [
+  getAllMenuItems,
+  createMenuItem,
+  updateMenuItem,
+  updateSoldOutMenuItem,
+];
 
 // 系統資源列表
 const resources = [

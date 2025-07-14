@@ -29,23 +29,6 @@ export const MENU_ITEM_QUERY = gql`
             customizedTaxRate
             menuItemTagSortingType
 
-            # online-platform menu releation
-            onlineRestaurantMenuItem {
-              uuid
-            }
-            grabfoodMenuItem {
-              uuid
-            }
-            ubereatsMenuItem {
-              uuid
-            }
-            ubereatsV2MenuItem {
-              uuid
-            }
-            foodpandaMenuItem {
-              uuid
-            }
-
             itemTagRelationshipList {
               followingSeparatorCount
               tagLikeObject {

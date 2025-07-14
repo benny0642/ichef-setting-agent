@@ -128,7 +128,8 @@ const updateMenuItem: IChefMcpTool = {
       },
       enabled: {
         type: 'boolean',
-        description: '是否啟用商品（選填）',
+        description:
+          '啟用/停用商品（選填），停用與停售不同，停售要用 updateSoldOutItems',
       },
       sortingIndex: {
         type: 'number',
