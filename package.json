@@ -8,6 +8,8 @@
   },
   "scripts": {
     "build": "tsc && chmod 755 build/index.js",
+    "dev": "tsc --watch",
+    "start": "node build/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -26,6 +28,7 @@
     "graphql": "^16.11.0",
     "graphql-request": "^7.2.0",
     "lodash": "^4.17.21",
+    "winston": "^3.11.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {

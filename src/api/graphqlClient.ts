@@ -1,21 +1,22 @@
 import { GraphQLClient } from 'graphql-request';
+import { getApiConfig } from '../config/apiConfig.js';
 
 // GraphQL 客戶端設定
 export const createGraphQLClient = () => {
-  const endpoint = 'http://localhost:8026/api/graphql/';
-  const token = '0d74c19882535498d2d19e58433c1527944e2535';
+  const config = getApiConfig();
+  const { graphqlEndpoint, graphqlToken } = config;
 
-  if (!endpoint) {
+  if (!graphqlEndpoint) {
     throw new Error('GRAPHQL_ENDPOINT environment variable is not set');
   }
 
-  if (!token) {
+  if (!graphqlToken) {
     throw new Error('GRAPHQL_TOKEN environment variable is not set');
   }
 
-  return new GraphQLClient(endpoint, {
+  return new GraphQLClient(graphqlEndpoint, {
     headers: {
-      Authorization: `token ${token}`,
+      Authorization: `token ${graphqlToken}`,
       'Content-Type': 'application/json',
     },
   });

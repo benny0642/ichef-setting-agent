@@ -1,11 +1,7 @@
-import { Tool as McpTool } from '@modelcontextprotocol/sdk/types.js';
 import { MENU_ITEM_LISTING_QUERY } from '../api/gql/menuItemListingQuery.js';
 import { createGraphQLClient } from '../api/graphqlClient.js';
+import { IChefMcpTool, McpToolResponse } from '../types/mcpTypes.js';
 import { MenuItemListingResponse } from '../types/menuTypes.js';
-
-interface Tool extends McpTool {
-  handler: () => Promise<{ content: { type: 'text'; text: string }[] }>;
-}
 
 // 格式化菜單資料的輔助函數
 const formatMenuData = (data: MenuItemListingResponse): string => {
@@ -18,41 +14,48 @@ const formatMenuData = (data: MenuItemListingResponse): string => {
     result += `- 分類 ID: ${category.uuid}\n`;
     result += `- 排序索引: ${category.sortingIndex}\n`;
     result += `- 來自總部: ${category.isFromHq ? '是' : '否'}\n`;
-    result += `- 菜單項目數量: ${category.menuItems.length}\n\n`;
+    result += `- 商品數量: ${category.menuItems.length}\n\n`;
 
     if (category.menuItems.length > 0) {
-      result += '### 菜單項目:\n';
+      result += '### 商品列表:\n';
       category.menuItems.forEach((item, itemIndex) => {
-        result += `${itemIndex + 1}. **${item.name}**\n`;
+        result += `${itemIndex + 1}. **${item.name}** (${item.uuid})\n`;
         result += `   - 價格: $${item.price}\n`;
         result += `   - 類型: ${item.type}\n`;
-        result += `   - 啟用狀態: ${item.enabled ? '啟用' : '停用'}\n`;
+        result += `   - 狀態: ${item.enabled ? '啟用' : '停用'}\n`;
+        result += `   - 排序: ${item.sortingIndex}\n`;
         result += `   - 完整性: ${item.isIncomplete ? '不完整' : '完整'}\n`;
-        result += `   - UUID: ${item.uuid}\n`;
+        result += `   - 來自總部: ${item.isFromHq ? '是' : '否'}\n`;
+
         if (item.picture) {
           result += `   - 圖片: ${item.picture}\n`;
         }
+
+        if (item.onlineRestaurantMenuItem?.uuid) {
+          result += `   - 線上商品 ID: ${item.onlineRestaurantMenuItem.uuid}\n`;
+        }
+
         result += '\n';
       });
-    } else {
-      result += '   (此分類暫無菜單項目)\n';
     }
 
-    result += '\n---\n\n';
+    result += '---\n\n';
   });
 
   return result;
 };
 
-export const getAllMenuItems: Tool = {
+const getAllMenuItems: IChefMcpTool = {
   name: 'getAllMenuItems',
-  description:
-    'Get all menu items from GraphQL API with categories and detailed information',
+  description: '取得所有菜單項目的詳細資訊，包括商品分類和商品列表',
+  category: 'menu',
+  version: '1.0.0',
   inputSchema: {
     type: 'object',
     properties: {},
+    required: [],
   },
-  handler: async () => {
+  handler: async (): Promise<McpToolResponse> => {
     try {
       // 建立 GraphQL 客戶端
       const client = createGraphQLClient();
@@ -109,6 +112,7 @@ export const getAllMenuItems: Tool = {
             text: `🚨 取得菜單項目時發生錯誤:\n\n${errorMessage}\n\n原始錯誤: ${error}`,
           },
         ],
+        isError: true,
       };
     }
   },
