@@ -1,5 +1,5 @@
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types.js';
-import { MENU_ITEM_LISTING_QUERY } from '../api/gql/menuQueries.js';
+import { MENU_ITEM_LISTING_QUERY } from '../api/gql/menuItemListingQuery.js';
 import { createGraphQLClient } from '../api/graphqlClient.js';
 import { MenuItemListingResponse } from '../types/menuTypes.js';
 

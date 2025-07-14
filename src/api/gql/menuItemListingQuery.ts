@@ -1,5 +1,3 @@
-import { gql } from 'graphql-request';
-
 // GraphQL 查詢語句
 export const MENU_ITEM_LISTING_QUERY = gql`
   query menuItemListingQuery {
