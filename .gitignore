@@ -2,3 +2,4 @@ node_modules
 build/
 .env
 schema.json
+src/types/generated.ts
