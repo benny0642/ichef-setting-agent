@@ -10,6 +10,7 @@ import {
 import winston from 'winston';
 import createMenuItem from './tools/createMenuItem.js';
 import getAllMenuItems from './tools/getAllMenuItems.js';
+import getMenuItemDetails from './tools/getMenuItemDetails.js';
 import updateMenuItem from './tools/updateMenuItem.js';
 import updateSoldOutMenuItem from './tools/updateSoldOutMenuItem.js';
 
@@ -45,12 +46,13 @@ const server = new Server(
   }
 );
 
-// 註冊的工具列表
+// 註冊所有工具
 const tools = [
   getAllMenuItems,
   createMenuItem,
   updateMenuItem,
   updateSoldOutMenuItem,
+  getMenuItemDetails,
 ];
 
 // 系統資源列表

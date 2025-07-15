@@ -20,7 +20,8 @@
   - [x] 3.2 實現商品新增功能和必填欄位驗證
   - [x] 3.3 實現商品編輯功能（支援部分更新）
   - [x] 3.4 實現停售商品功能（批次更新商品停售狀態）
-  - [ ] 3.5 建立商品資料轉換和格式化邏輯
+  - [x] 3.5 實現商品新增、修改註記功能（支援商品標籤和標籤群組）
+  - [ ] 3.6 建立商品資料轉換和格式化邏輯
 
 - [ ] 4.0 實現錯誤處理與驗證機制
   - [ ] 4.1 建立統一的錯誤處理架構
@@ -50,9 +51,10 @@
 - `src/api/gql/index.ts` - GraphQL 查詢和 mutation 統一匯出 ✅
 - `src/tools/getAllMenuItems.ts` - 取得所有商品列表工具 ✅
 - `src/tools/createMenuItem.ts` - 商品新增工具 ✅
-- `src/tools/updateMenuItem.ts` - 商品更新工具 ✅
+- `src/tools/updateMenuItem.ts` - 商品更新工具（支援註記編輯）✅
 - `src/tools/updateSoldOutMenuItem.ts` - 商品停售狀態更新工具 ✅
-- `src/types/menuTypes.ts` - 商品相關類型定義 ✅
+- `src/tools/getMenuItemTags.ts` - 取得商品註記資訊工具 ✅
+- `src/types/menuTypes.ts` - 商品相關類型定義（包含註記類型）✅
 - `src/types/mcpTypes.ts` - MCP 工具相關類型定義 ✅
 
 ---

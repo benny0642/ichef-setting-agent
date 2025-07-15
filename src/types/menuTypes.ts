@@ -23,6 +23,54 @@ export enum ComboMenuItemSortingType {
   ALPHABETICAL = 'ALPHABETICAL',
 }
 
+// 商品註記相關類型
+export interface SubTagInItemPayload {
+  enabled: boolean;
+  subTagUuid: UUID;
+}
+
+export interface ItemTagRelationshipPayload {
+  followingSeparatorCount?: number;
+  menuItemTagUuid?: UUID;
+  subTagList?: SubTagInItemPayload[];
+  tagGroupUuid?: UUID;
+}
+
+export interface SubTagInItemEnabledInformation {
+  subTagInItemEnabled?: boolean;
+  __typename?: string;
+}
+
+export interface SubTagInItemType {
+  computedEnabled?: boolean;
+  enabledInformation?: SubTagInItemEnabledInformation;
+  menuItemTagName?: string;
+  menuItemTagUuid?: string;
+  subTagUuid?: string;
+  __typename?: string;
+}
+
+export interface MenuItemTagInItemType {
+  __typename: 'MenuItemTagInItemType';
+  menuItemTagUuid?: string;
+}
+
+export interface TagGroupInItemType {
+  __typename: 'TagGroupInItemType';
+  tagGroupUuid?: string;
+  subTagInItems?: SubTagInItemType[];
+}
+
+export interface ItemTagRelationshipType {
+  customSortingIndex?: number;
+  defaultSortingIndex?: number;
+  followingSeparatorCount?: number;
+  menuItemTagUuid?: string;
+  menuItemUuid?: string;
+  tagLikeObject?: MenuItemTagInItemType | TagGroupInItemType;
+  __typename?: string;
+}
+
 // 線上餐廳商品介面
 export interface OnlineRestaurantMenuItem {
   uuid: UUID;
@@ -103,6 +151,7 @@ export interface MenuItemType {
   ubereatsMenuItem?: OnlineRestaurantMenuItem;
   ubereatsV2MenuItem?: OnlineRestaurantMenuItem;
   foodpandaMenuItem?: OnlineRestaurantMenuItem;
+  itemTagRelationshipList?: ItemTagRelationshipType[];
   __typename?: string;
 }
 
@@ -198,6 +247,7 @@ export interface CreateMenuItemPayload {
   customizedTaxEnabled?: boolean;
   customizedTaxType?: CustomizedTaxType;
   customizedTaxRate?: number;
+  itemTagRelationshipList?: ItemTagRelationshipPayload[];
 }
 
 // 更新商品 Payload
@@ -213,6 +263,7 @@ export interface UpdateMenuItemPayload {
   customizedTaxEnabled?: boolean;
   customizedTaxType?: CustomizedTaxType;
   customizedTaxRate?: number;
+  itemTagRelationshipList?: ItemTagRelationshipPayload[];
 }
 
 // 認證 Token
