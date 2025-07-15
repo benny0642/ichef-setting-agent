@@ -17,7 +17,9 @@
     "lint:fix": "eslint . --fix",
     "download-schema": "node scripts/downloadSchema.mjs",
     "codegen": "graphql-codegen --config codegen.yml",
-    "codegen:watch": "graphql-codegen --config codegen.yml --watch"
+    "codegen:watch": "graphql-codegen --config codegen.yml --watch",
+    "inspector": "mcp-inspector",
+    "dev:inspector": "npm run build && mcp-inspector"
   },
   "files": [
     "build"
@@ -43,6 +45,7 @@
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-codegen/typescript-graphql-request": "^6.3.0",
     "@graphql-codegen/typescript-operations": "^4.6.1",
+    "@modelcontextprotocol/inspector": "^0.15.0",
     "@types/lodash": "^4.17.20",
     "@types/node": "^24.0.13",
     "eslint": "^9.30.1",

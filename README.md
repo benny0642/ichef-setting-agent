@@ -93,7 +93,29 @@ npm start
 npm run dev
 ```
 
-### 5. Claude Desktop 配置
+### 5. 使用 MCP Inspector 進行開發（推薦）
+
+我們提供了 MCP Inspector 來幫助您測試和除錯伺服器：
+
+```bash
+# 快速啟動 Inspector（建議）
+npm run start:inspector
+
+# 或者分別執行
+npm run build
+npm run inspector
+```
+
+Inspector 會：
+
+- 🌐 在瀏覽器中開啟圖形化介面
+- 🔧 讓您測試所有工具功能
+- 📊 顯示伺服器狀態和日誌
+- 🐛 協助除錯和開發
+
+詳細使用說明請參考：[MCP Inspector 開發指南](docs/development-with-inspector.md)
+
+### 6. Claude Desktop 配置
 
 在 Claude Desktop 中使用此 MCP Server，需要在 Claude 的配置檔案中加入以下設定：
 
