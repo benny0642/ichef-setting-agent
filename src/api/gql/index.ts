@@ -5,6 +5,7 @@
 // 查詢 (Queries)
 export { MENU_ITEM_LISTING_QUERY } from './menuItemListingQuery.js';
 export { MENU_ITEM_QUERY } from './menuItemQuery.js';
+export { MENU_ITEM_TAG_LISTING_QUERY } from './menuItemTagListingQuery.js';
 
 // 變更 (Mutations)
 export { MENU_ITEM_CREATE_MUTATION } from './createMenuItemMutation.js';
@@ -16,6 +17,7 @@ import { MENU_ITEM_CREATE_MUTATION } from './createMenuItemMutation.js';
 import { DELETE_MENU_ITEM_MUTATION } from './deleteMenuItemMutation.js';
 import { MENU_ITEM_LISTING_QUERY } from './menuItemListingQuery.js';
 import { MENU_ITEM_QUERY } from './menuItemQuery.js';
+import { MENU_ITEM_TAG_LISTING_QUERY } from './menuItemTagListingQuery.js';
 import { MENU_ITEM_UPDATE_MUTATION } from './updateMenuItemMutation.js';
 
 /**
@@ -26,6 +28,7 @@ export const GraphQLOperations = {
   queries: {
     MENU_ITEM_LISTING_QUERY,
     MENU_ITEM_QUERY,
+    MENU_ITEM_TAG_LISTING_QUERY,
   },
 
   // 變更操作

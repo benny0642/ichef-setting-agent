@@ -342,3 +342,38 @@ export interface UpdateSoldOutMenuItemResponse {
     __typename?: string;
   };
 }
+
+// 商品註記查詢相關類型
+export interface MenuItemTagType {
+  uuid: UUID;
+  name: string;
+  type: string;
+  enabled: boolean;
+  price: number;
+  sortingIndex: number;
+  __typename?: string;
+}
+
+export interface TagGroupType {
+  uuid: UUID;
+  name: string;
+  enabled: boolean;
+  sortingIndex: number;
+  subTags: MenuItemTagType[];
+  __typename?: string;
+}
+
+// 註記查詢回應類型
+export interface MenuItemTagListingResponse {
+  restaurant: {
+    settings: {
+      menu: {
+        menuItemTags: MenuItemTagType[];
+        tagGroups: TagGroupType[];
+        __typename?: string;
+      };
+      __typename?: string;
+    };
+    __typename?: string;
+  };
+}

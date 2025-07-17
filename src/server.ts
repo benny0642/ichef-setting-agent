@@ -11,6 +11,7 @@ import winston from 'winston';
 import createMenuItem from './tools/createMenuItem.js';
 import getAllMenuItems from './tools/getAllMenuItems.js';
 import getMenuItemDetails from './tools/getMenuItemDetails.js';
+import getMenuItemTags from './tools/getMenuItemTags.js';
 import updateMenuItem from './tools/updateMenuItem.js';
 import updateSoldOutMenuItem from './tools/updateSoldOutMenuItem.js';
 
@@ -53,6 +54,7 @@ const tools = [
   updateMenuItem,
   updateSoldOutMenuItem,
   getMenuItemDetails,
+  getMenuItemTags,
 ];
 
 // 系統資源列表
