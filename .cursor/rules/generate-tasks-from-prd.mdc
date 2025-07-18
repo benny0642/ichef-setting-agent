@@ -4,57 +4,72 @@ globs:
 alwaysApply: false
 ---
 
-# Rule: Generating a Task List from a PRD
+# 規則：從 PRD 生成任務清單
 
-## Goal
+## 目標
 
-To guide an AI assistant in creating a detailed, step-by-step task list in Markdown format based on an existing Product Requirements Document (PRD). The task list should be suitable for a developer to follow for implementation.
+引導 AI 助理根據現有的產品需求文件 (PRD) 建立一份詳細、逐步的 Markdown 格式任務清單。該任務清單應適合開發人員遵循以進行實作。
 
-## Output
+## 輸出
 
-- **Format:** Markdown (`.md`)
-- **Location:** `/tasks/`
-- **Filename:** `TASKS-[PRD-FILE-NAME].md` (e.g., `TASKS-PRD-USER-PROFILE-EDITING.md`)
+- **格式：** Markdown (`.md`)
+- **位置：** `/tasks/`
+- **檔名：** `TASKS-[PRD-FILE-NAME].md` (例如：`TASKS-PRD-USER-PROFILE-EDITING.md`)
 
-## Process
+---
 
-1.  **Receive PRD Reference:** The user points the AI to a specific PRD file
-2.  **Analyze PRD:** The AI reads and analyzes the functional requirements, user stories, and other sections of the specified PRD.
-3.  **Phase 1: Generate Parent Tasks:** Based on the PRD analysis, create the file and generate the main, high-level tasks required to implement the feature. Use your judgement on how many high-level tasks to use. It's likely to be 3-5. Present these tasks to the user in the specified format (without sub-tasks yet). Inform the user: "I have generated the high-level tasks based on the PRD. Ready to generate the sub-tasks? Respond with 'Go' to proceed."
-4.  **Wait for Confirmation:** Pause and wait for the user to respond with "Go".
-5.  **Phase 2: Generate Sub-Tasks:** Once the user confirms, break down each parent task into smaller, actionable sub-tasks. Ensure sub-tasks logically follow from the parent task and cover the implementation details implied by the PRD.
-6.  **Identify Relevant Files:** Based on the tasks and PRD, identify potential files that will need to be created or modified. List these under the `Relevant Files` section with a brief description of their purpose in relation to the tasks.
-7.  **Generate Final Output:** Combine the parent tasks, sub-tasks, and relevant files into the final Markdown structure.
-8.  **Save Task List:** Save the generated document in the `/tasks/` directory with the filename `TASKS-[PRD-FILE-NAME].md`, where `[PRD-FILE-NAME]` matches the base name of the input PRD file (e.g., if the input was `PRD-USER-PROFILE-EDITING.md`, the output is `TASKS-PRD-USER-PROFILE-EDITING.md`).
+## 流程
 
-## Output Format
+1.  **接收 PRD 參考：** 使用者向 AI 指向一個特定的 PRD 檔案。
+2.  **分析 PRD：** AI 讀取並分析指定 PRD 中的功能需求、使用者故事及其他部分。
+3.  **階段 1：生成父任務：** 根據 PRD 分析，建立檔案並生成實作該功能所需的主要、高階任務。請自行判斷使用多少個高階任務，大約 3-5 個。以指定格式（暫不含子任務）向使用者呈現這些任務。告知使用者：「我已根據 PRD 生成了高階任務。準備好生成子任務了嗎？請回覆『Go』以繼續。」
+4.  **等待確認：** 暫停並等待使用者回覆「Go」。
+5.  **階段 2：生成子任務：** 一旦使用者確認，將每個父任務分解為更小、可執行的子任務。確保子任務邏輯上承接父任務，並涵蓋 PRD 所暗示的實作細節。
+6.  **詢問相關資訊：** 在生成子任務之後，**AI 應詢問使用者：「有沒有已知與子任務相關的檔案、API、GraphQL schema、可能的 type，可以放進 tasks 中當作 context？如果有，請將相關的資料附在 subtasks 的下面。」**
+7.  **識別相關檔案：** 根據任務、PRD 以及使用者提供的額外資訊，識別可能需要建立或修改的檔案。將這些檔案列在「`Relevant Files`」（相關檔案）部分，並簡要描述其與任務相關的用途。
+8.  **生成最終輸出：** 將父任務、子任務和相關檔案組合成最終的 Markdown 結構。
+9.  **儲存任務清單：** 將生成的文檔儲存在 `/tasks/` 目錄中，檔名為 `TASKS-[PRD-FILE-NAME].md`，其中 `[PRD-FILE-NAME]` 與輸入 PRD 檔案的基本名稱匹配（例如：如果輸入是 `PRD-USER-PROFILE-EDITING.md`，則輸出為 `TASKS-PRD-USER-PROFILE-EDITING.md`）。
 
-The generated task list _must_ follow this structure:
+---
+
+## 輸出格式
+
+生成的任務清單**必須**遵循此結構：
 
 ```markdown
-## Tasks
+## 任務
 
-- [ ] 1.0 Parent Task Title
-  - [ ] 1.1 Sub-task description
-  - [ ] 1.2 Sub-task description
-- [ ] 2.0 Parent Task Title
-  - [ ] 2.1 Sub-task description
-  - [ ] 2.2 Sub-task description
-  - [ ] 2.3 Sub-task description
-- [ ] 3.0 Parent Task Title (may not have sub-tasks if simple enough)
+- [ ] 1.0 父任務標題
+  - [ ] 1.1 子任務描述
+    - 相關資訊：
+      - API: `GET /api/users/{id}` - 用於取得使用者資料
+      - Schema: `UserType` - 定義於 `types/user.ts`
+  - [ ] 1.2 子任務描述
+- [ ] 2.0 父任務標題
+  - [ ] 2.1 子任務描述
+    - 相關資訊：
+      - 檔案: `components/UserProfileForm.tsx` - 負責表單渲染
+      - GraphQL Query: `getUserProfile` - 查詢使用者詳細資料
+  - [ ] 2.2 子任務描述
+  - [ ] 2.3 子任務描述
+- [ ] 3.0 父任務標題 (如果夠簡單，可能沒有子任務)
 
-### Relevant Files
+### 相關檔案
 
-- `path/to/potential/file1.ts` - Brief description of why this file is relevant (e.g., Contains the main component for this feature).
-- `path/to/another/file.tsx` - Brief description (e.g., API route handler for data submission).
-- `lib/utils/helpers.ts` - Brief description (e.g., Utility functions needed for calculations).
+- `path/to/potential/file1.ts` - 簡要說明此檔案為何相關 (例如：包含此功能的主要組件)。
+- `path/to/another/file.tsx` - 簡要說明 (例如：用於資料提交的 API 路由處理程式)。
+- `lib/utils/helpers.ts` - 簡要說明 (例如：計算所需的實用函數)。
 ```
 
-## Interaction Model
+---
 
-The process explicitly requires a pause after generating parent tasks to get user confirmation ("Go") before proceeding to generate sub-tasks. This ensures the high-level plan aligns with user expectations before diving into details.
+## 互動模式
 
-## Target Audience
+此流程明確要求在生成父任務後暫停，以獲得使用者確認（「Go」），然後才繼續生成子任務。此外，在子任務生成後，AI 會主動詢問使用者是否有相關的程式碼或定義檔案可以納入。這確保了高階計畫在深入細節之前與使用者期望一致，並能讓最終的任務清單包含更豐富的開發上下文。
 
-Assume the primary reader of the task list is a **developer** who will implement the feature.
+---
+
+## 目標受眾
+
+假設任務清單的主要讀者是將實作功能的**開發人員**。
 **IMPORTANT** All conversations and outputs must be in Traditional Chinese.
