@@ -3,6 +3,7 @@
  */
 
 // 查詢 (Queries)
+export { COMBO_DEPENDENCY_CHECK_QUERY } from './comboDependencyCheckQuery.js';
 export { MENU_ITEM_LISTING_QUERY } from './menuItemListingQuery.js';
 export { MENU_ITEM_QUERY } from './menuItemQuery.js';
 export { MENU_ITEM_TAG_LISTING_QUERY } from './menuItemTagListingQuery.js';
@@ -16,6 +17,7 @@ export { ONLINE_RESTAURANT_MENU_ITEM_IMPORT_MUTATION } from './onlineRestaurantM
 export { MENU_ITEM_UPDATE_MUTATION } from './updateMenuItemMutation.js';
 
 // 匯入所有定義用於物件分類
+import { COMBO_DEPENDENCY_CHECK_QUERY } from './comboDependencyCheckQuery.js';
 import { MENU_ITEM_CREATE_MUTATION } from './createMenuItemMutation.js';
 import { DELETE_MENU_ITEM_MUTATION } from './deleteMenuItemMutation.js';
 import { MENU_ITEM_LISTING_QUERY } from './menuItemListingQuery.js';
@@ -36,6 +38,7 @@ export const GraphQLOperations = {
     MENU_ITEM_QUERY,
     MENU_ITEM_TAG_LISTING_QUERY,
     ONLINE_RESTAURANT_MENU_ITEM_LISTING_QUERY,
+    COMBO_DEPENDENCY_CHECK_QUERY,
   },
 
   // 變更操作
