@@ -7,8 +7,8 @@ export type UUID = string;
 
 // 商品類型枚舉
 export enum MenuItemTypeEnum {
-  ITEM = 'ITEM',
-  COMBO_ITEM = 'COMBO_ITEM',
+  ITEM = 'item',
+  COMBO_ITEM = 'combo',
 }
 
 // 自訂稅務類型枚舉
@@ -191,6 +191,9 @@ export interface MenuItemCreateResponse {
       menu: {
         createMenuItem: {
           uuid: UUID;
+          name: string;
+          type: MenuItemTypeEnum;
+          comboItemCategories?: ComboItemCategoryType[];
           __typename?: string;
         };
         __typename?: string;
@@ -235,6 +238,23 @@ export interface MenuItemDeleteResponse {
   };
 }
 
+// 套餐商品輸入類型
+export interface ComboMenuItemInput {
+  uuid?: UUID; // 用於更新現有子商品
+  menuItemUuid: UUID; // 關聯的單品商品 UUID
+  price?: string; // 加價金額（字串格式）
+}
+
+// 套餐分類輸入類型
+export interface ComboItemCategoryInput {
+  uuid?: UUID; // 用於更新現有分類
+  name: string;
+  allowRepeatableSelection?: boolean;
+  minimumSelection?: number;
+  maximumSelection?: number;
+  comboMenuItems: ComboMenuItemInput[];
+}
+
 // 新增商品 Payload
 export interface CreateMenuItemPayload {
   name: string;
@@ -249,6 +269,7 @@ export interface CreateMenuItemPayload {
   customizedTaxType?: CustomizedTaxType;
   customizedTaxRate?: number;
   itemTagRelationshipList?: ItemTagRelationshipPayload[];
+  comboItemCategories?: ComboItemCategoryInput[];
 }
 
 // 更新商品 Payload

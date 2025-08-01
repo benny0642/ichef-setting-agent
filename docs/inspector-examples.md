@@ -87,7 +87,7 @@
 }
 ```
 
-### 3. 測試 createMenuItem
+### 3. 測試 createMenuItem (單品)
 
 **目的**: 建立新的菜單項目
 
@@ -98,12 +98,60 @@
    ```json
    {
      "name": "雞肉飯",
-     "description": "香嫩雞肉配白飯",
      "price": 120,
-     "categoryId": "cat_123",
-     "available": true,
-     "ingredients": ["雞肉", "白飯", "醬汁"],
-     "allergens": []
+     "menuItemCategoryUuid": "550e8400-e29b-41d4-a716-446655440000",
+     "type": "item",
+     "enabled": true
+   }
+   ```
+3. 點擊 "Execute"
+
+### 4. 測試 createMenuItem (套餐)
+
+**目的**: 建立新的套餐商品
+
+**步驟**:
+
+1. 點擊 `createMenuItem`
+2. 輸入參數：
+   ```json
+   {
+     "name": "午餐套餐",
+     "price": 250,
+     "menuItemCategoryUuid": "550e8400-e29b-41d4-a716-446655440000",
+     "type": "combo",
+     "enabled": true,
+     "comboItemCategories": [
+       {
+         "name": "主餐",
+         "minimumSelection": 1,
+         "maximumSelection": 1,
+         "comboMenuItems": [
+           {
+             "menuItemUuid": "550e8400-e29b-41d4-a716-446655440001"
+           },
+           {
+             "menuItemUuid": "550e8400-e29b-41d4-a716-446655440002",
+             "price": "20"
+           }
+         ]
+       },
+       {
+         "name": "飲料",
+         "minimumSelection": 1,
+         "maximumSelection": 2,
+         "allowRepeatableSelection": true,
+         "comboMenuItems": [
+           {
+             "menuItemUuid": "550e8400-e29b-41d4-a716-446655440003"
+           },
+           {
+             "menuItemUuid": "550e8400-e29b-41d4-a716-446655440004",
+             "price": "10"
+           }
+         ]
+       }
+     ]
    }
    ```
 3. 點擊 "Execute"

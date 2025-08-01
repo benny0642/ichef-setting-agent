@@ -93,7 +93,7 @@ export function convertMenuListingToDisplayFormat(
 export function convertToCreateMenuItemPayload(input: {
   name: string;
   price: number;
-  type: 'ITEM' | 'COMBO_ITEM';
+  type: 'item' | 'combo';
   categoryUuid: UUID;
   enabled?: boolean;
   sortingIndex?: number;
@@ -124,7 +124,7 @@ export function convertToCreateMenuItemPayload(input: {
 export function convertToUpdateMenuItemPayload(input: {
   name?: string;
   price?: number;
-  type?: 'ITEM' | 'COMBO_ITEM';
+  type?: 'item' | 'combo';
   categoryUuid?: UUID;
   enabled?: boolean;
   sortingIndex?: number;

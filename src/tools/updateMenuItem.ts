@@ -12,7 +12,7 @@ interface UpdateMenuItemArgs {
   name?: string;
   price?: number;
   menuItemCategoryUuid?: string;
-  type?: 'ITEM' | 'COMBO_ITEM';
+  type?: 'item' | 'combo';
   enabled?: boolean;
   sortingIndex?: number;
   picture?: string;
@@ -49,9 +49,7 @@ const formatUpdateSuccessResponse = (
   }
 
   if (args.type !== undefined) {
-    updatedFields.push(
-      `🏷️ 類型: ${args.type === 'COMBO_ITEM' ? '套餐' : '單品'}`
-    );
+    updatedFields.push(`🏷️ 類型: ${args.type === 'combo' ? '套餐' : '單品'}`);
   }
 
   if (args.enabled !== undefined) {
@@ -158,7 +156,7 @@ const updateMenuItem: IChefMcpTool = {
       },
       type: {
         type: 'string',
-        enum: ['ITEM', 'COMBO_ITEM'],
+        enum: ['item', 'combo'],
         description: '商品類型（選填）',
       },
       enabled: {
@@ -311,9 +309,9 @@ const updateMenuItem: IChefMcpTool = {
 
       // 驗證商品類型
       if (updateArgs.type !== undefined) {
-        const validTypes = ['ITEM', 'COMBO_ITEM'];
+        const validTypes = ['item', 'combo'];
         if (!validTypes.includes(updateArgs.type)) {
-          throw new Error('商品類型必須是 ITEM 或 COMBO_ITEM');
+          throw new Error('商品類型必須是 item 或 combo');
         }
       }
 
