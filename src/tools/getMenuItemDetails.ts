@@ -82,7 +82,7 @@ const formatMenuItemDetails = (menuItem: MenuItemType): string => {
   result += `   - UUID: ${menuItem.uuid}\n`;
   result += `   - 名稱: ${menuItem.name}\n`;
   result += `   - 價格: $${menuItem.price}\n`;
-  result += `   - 類型: ${menuItem.type === 'COMBO_ITEM' ? '套餐' : '單品'}\n`;
+  result += `   - 類型: ${menuItem.type === 'combo' ? '套餐' : '單品'}\n`;
   result += `   - 狀態: ${menuItem.enabled ? '✅ 啟用' : '❌ 停用'}\n`;
   result += `   - 是否不完整: ${menuItem.isIncomplete ? '❌ 是' : '✅ 否'}\n`;
   result += `   - 來自總部: ${menuItem.isFromHq ? '✅ 是' : '❌ 否'}\n\n`;
