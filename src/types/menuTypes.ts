@@ -252,7 +252,8 @@ export interface ComboItemCategoryInput {
   allowRepeatableSelection?: boolean;
   minimumSelection?: number;
   maximumSelection?: number;
-  comboMenuItems: ComboMenuItemInput[];
+  comboMenuItemSortingType?: ComboMenuItemSortingType;
+  comboMenuItems?: ComboMenuItemInput[];
 }
 
 // 新增商品 Payload
@@ -270,24 +271,6 @@ export interface CreateMenuItemPayload {
   customizedTaxRate?: number;
   itemTagRelationshipList?: ItemTagRelationshipPayload[];
   comboItemCategories?: ComboItemCategoryInput[];
-}
-
-// 套餐商品輸入介面
-export interface ComboMenuItemInput {
-  uuid?: UUID; // 用於更新現有子商品
-  menuItemUuid: UUID; // 關聯的單品商品 UUID
-  price?: string; // 加價金額（字串格式）
-}
-
-// 套餐分類輸入介面
-export interface ComboItemCategoryInput {
-  uuid?: UUID; // 用於更新現有分類
-  name: string;
-  allowRepeatableSelection: boolean;
-  minimumSelection: number;
-  maximumSelection: number;
-  comboMenuItemSortingType?: ComboMenuItemSortingType;
-  comboMenuItems?: ComboMenuItemInput[];
 }
 
 // 更新商品 Payload
@@ -321,6 +304,59 @@ export interface AuthValidationResult {
   isExpired: boolean;
   expiresIn?: number;
   error?: string;
+}
+
+// 外送菜單分類型別
+export interface OnlineRestaurantMenuCategory {
+  _id: UUID;
+  uuid: UUID;
+  name: string;
+  sortingIndex: number;
+  menuItems: OnlineRestaurantMenuItem[];
+  __typename?: string;
+}
+
+// 外送菜單項目型別
+export interface OnlineRestaurantMenuItem {
+  _id: UUID;
+  uuid: UUID;
+  ichefUuid: UUID;
+  originalName: string;
+  customizedName?: string;
+  originalPrice: number;
+  menuItemType: string;
+  pictureFilename?: string;
+  sortingIndex: number;
+  category: {
+    uuid: UUID;
+    sortingIndex: number;
+    __typename?: string;
+  };
+  menuItem: {
+    isFromHq: boolean;
+    __typename?: string;
+  };
+  __typename?: string;
+}
+
+// 完整菜單結構型別
+export interface OnlineRestaurantMenuStructure {
+  restaurant: {
+    settings: {
+      menu: {
+        integration: {
+          onlineRestaurant: {
+            categories: OnlineRestaurantMenuCategory[];
+            __typename?: string;
+          };
+          __typename?: string;
+        };
+        __typename?: string;
+      };
+      __typename?: string;
+    };
+    __typename?: string;
+  };
 }
 
 // 認證錯誤
