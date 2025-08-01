@@ -12,6 +12,7 @@ import createMenuItem from './tools/createMenuItem.js';
 import getAllMenuItems from './tools/getAllMenuItems.js';
 import getMenuItemDetails from './tools/getMenuItemDetails.js';
 import getMenuItemTags from './tools/getMenuItemTags.js';
+import getOnlineRestaurantMenuItemListing from './tools/getOnlineRestaurantMenuItemListing.js';
 import updateMenuItem from './tools/updateMenuItem.js';
 import updateOnlineRestaurantStatus from './tools/updateOnlineRestaurantStatus.js';
 import updateSoldOutMenuItem from './tools/updateSoldOutMenuItem.js';
@@ -56,6 +57,7 @@ const tools = [
   updateSoldOutMenuItem,
   getMenuItemDetails,
   getMenuItemTags,
+  getOnlineRestaurantMenuItemListing,
   updateOnlineRestaurantStatus,
 ];
 
