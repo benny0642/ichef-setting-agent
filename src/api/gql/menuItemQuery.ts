@@ -79,6 +79,7 @@ export const MENU_ITEM_QUERY = gql`
     name
     comboMenuItems {
       uuid
+      name
       price
       menuItemUuid
       onlineRestaurantMenuItem {

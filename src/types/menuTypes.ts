@@ -7,8 +7,8 @@ export type UUID = string;
 
 // 商品類型枚舉
 export enum MenuItemTypeEnum {
-  ITEM = 'ITEM',
-  COMBO_ITEM = 'COMBO_ITEM',
+  ITEM = 'item',
+  COMBO_ITEM = 'combo',
 }
 
 // 自訂稅務類型枚舉
@@ -71,8 +71,8 @@ export interface ItemTagRelationshipType {
   __typename?: string;
 }
 
-// 線上餐廳商品介面
-export interface OnlineRestaurantMenuItem {
+// 線上餐廳商品關聯介面
+export interface OnlineRestaurantMenuItemAssociation {
   uuid: UUID;
   visible?: boolean;
   __typename?: string;
@@ -88,11 +88,12 @@ export interface OriginalPicture {
 // 套餐商品介面
 export interface ComboMenuItem {
   uuid: UUID;
+  name: string;
   price: number;
   menuItemUuid: UUID;
-  onlineRestaurantMenuItem?: OnlineRestaurantMenuItem;
-  instoreOrderingMenuItem?: OnlineRestaurantMenuItem;
-  ubereatsV2MenuItem?: OnlineRestaurantMenuItem;
+  onlineRestaurantMenuItem?: OnlineRestaurantMenuItemAssociation;
+  instoreOrderingMenuItem?: OnlineRestaurantMenuItemAssociation;
+  ubereatsV2MenuItem?: OnlineRestaurantMenuItemAssociation;
   __typename?: string;
 }
 
@@ -146,11 +147,11 @@ export interface MenuItemType {
   comboItemCategoryUuidsMappedWithOnlineOrdering: {
     ubereats: string;
   };
-  onlineRestaurantMenuItem?: OnlineRestaurantMenuItem;
-  grabfoodMenuItem?: OnlineRestaurantMenuItem;
-  ubereatsMenuItem?: OnlineRestaurantMenuItem;
-  ubereatsV2MenuItem?: OnlineRestaurantMenuItem;
-  foodpandaMenuItem?: OnlineRestaurantMenuItem;
+  onlineRestaurantMenuItem?: OnlineRestaurantMenuItemAssociation;
+  grabfoodMenuItem?: OnlineRestaurantMenuItemAssociation;
+  ubereatsMenuItem?: OnlineRestaurantMenuItemAssociation;
+  ubereatsV2MenuItem?: OnlineRestaurantMenuItemAssociation;
+  foodpandaMenuItem?: OnlineRestaurantMenuItemAssociation;
   itemTagRelationshipList?: ItemTagRelationshipType[];
   __typename?: string;
 }
@@ -190,6 +191,9 @@ export interface MenuItemCreateResponse {
       menu: {
         createMenuItem: {
           uuid: UUID;
+          name: string;
+          type: MenuItemTypeEnum;
+          comboItemCategories?: ComboItemCategoryType[];
           __typename?: string;
         };
         __typename?: string;
@@ -234,6 +238,24 @@ export interface MenuItemDeleteResponse {
   };
 }
 
+// 套餐商品輸入類型
+export interface ComboMenuItemInput {
+  uuid?: UUID; // 用於更新現有子商品
+  menuItemUuid: UUID; // 關聯的單品商品 UUID
+  price?: string; // 加價金額（字串格式）
+}
+
+// 套餐分類輸入類型
+export interface ComboItemCategoryInput {
+  uuid?: UUID; // 用於更新現有分類
+  name: string;
+  allowRepeatableSelection?: boolean;
+  minimumSelection?: number;
+  maximumSelection?: number;
+  comboMenuItemSortingType?: ComboMenuItemSortingType;
+  comboMenuItems?: ComboMenuItemInput[];
+}
+
 // 新增商品 Payload
 export interface CreateMenuItemPayload {
   name: string;
@@ -248,6 +270,7 @@ export interface CreateMenuItemPayload {
   customizedTaxType?: CustomizedTaxType;
   customizedTaxRate?: number;
   itemTagRelationshipList?: ItemTagRelationshipPayload[];
+  comboItemCategories?: ComboItemCategoryInput[];
 }
 
 // 更新商品 Payload
@@ -264,6 +287,7 @@ export interface UpdateMenuItemPayload {
   customizedTaxType?: CustomizedTaxType;
   customizedTaxRate?: number;
   itemTagRelationshipList?: ItemTagRelationshipPayload[];
+  comboItemCategories?: ComboItemCategoryInput[];
 }
 
 // 認證 Token
@@ -280,6 +304,59 @@ export interface AuthValidationResult {
   isExpired: boolean;
   expiresIn?: number;
   error?: string;
+}
+
+// 外送菜單分類型別
+export interface OnlineRestaurantMenuCategory {
+  _id: UUID;
+  uuid: UUID;
+  name: string;
+  sortingIndex: number;
+  menuItems: OnlineRestaurantMenuItem[];
+  __typename?: string;
+}
+
+// 外送菜單項目型別
+export interface OnlineRestaurantMenuItem {
+  _id: UUID;
+  uuid: UUID;
+  ichefUuid: UUID;
+  originalName: string;
+  customizedName?: string;
+  originalPrice: number;
+  menuItemType: string;
+  pictureFilename?: string;
+  sortingIndex: number;
+  category: {
+    uuid: UUID;
+    sortingIndex: number;
+    __typename?: string;
+  };
+  menuItem: {
+    isFromHq: boolean;
+    __typename?: string;
+  };
+  __typename?: string;
+}
+
+// 完整菜單結構型別
+export interface OnlineRestaurantMenuStructure {
+  restaurant: {
+    settings: {
+      menu: {
+        integration: {
+          onlineRestaurant: {
+            categories: OnlineRestaurantMenuCategory[];
+            __typename?: string;
+          };
+          __typename?: string;
+        };
+        __typename?: string;
+      };
+      __typename?: string;
+    };
+    __typename?: string;
+  };
 }
 
 // 認證錯誤
@@ -370,6 +447,120 @@ export interface MenuItemTagListingResponse {
       menu: {
         menuItemTags: MenuItemTagType[];
         tagGroups: TagGroupType[];
+        __typename?: string;
+      };
+      __typename?: string;
+    };
+    __typename?: string;
+  };
+}
+
+// 批次刪除相關型別
+export interface BatchDeleteMenuItemArgs {
+  menuItemUuids: string[];
+}
+
+export interface BatchDeleteMenuItemResponse {
+  restaurant: {
+    settings: {
+      menu: {
+        integration: {
+          onlineRestaurant: {
+            deleteMenu: {
+              deletedCategoryUuids?: UUID[];
+              deletedMenuItemUuids?: UUID[];
+              __typename?: string;
+            };
+            __typename?: string;
+          };
+          __typename?: string;
+        };
+        __typename?: string;
+      };
+      __typename?: string;
+    };
+    __typename?: string;
+  };
+}
+
+// 線上餐廳商品匯入相關類型
+export interface OnlineRestaurantMenuItemImportResponse {
+  restaurant: {
+    settings: {
+      menu: {
+        integration: {
+          onlineRestaurant: {
+            importMenuItemToCategory?: Array<{
+              uuid: UUID;
+              name: string;
+              menuItems: Array<{
+                uuid: UUID;
+                ichefUuid: UUID;
+                originalName: string;
+                __typename?: string;
+              }>;
+              __typename?: string;
+            }> | null;
+            __typename?: string;
+          };
+          __typename?: string;
+        };
+        __typename?: string;
+      };
+      __typename?: string;
+    };
+    __typename?: string;
+  };
+}
+
+// 匯入商品參數
+export interface ImportMenuItemArgs {
+  categoryUuid: string;
+  ichefMenuItemUuids: string[];
+}
+
+// 匯入結果統計
+export interface ImportResult {
+  total: number;
+  successful: number;
+  skipped: number;
+  failed: number;
+  successfulItems: string[];
+  skippedItems: Array<{
+    uuid: string;
+    reason: string;
+  }>;
+  failedItems: Array<{
+    uuid: string;
+    error: string;
+  }>;
+}
+
+// 套餐依賴檢查回應
+export interface ComboDependencyCheckResponse {
+  restaurant: {
+    settings: {
+      menu: {
+        menuItemCategories: Array<{
+          menuItems: Array<{
+            uuid: string;
+            name: string;
+            type: string;
+            enabled: boolean;
+            comboItemCategories?: Array<{
+              uuid: string;
+              name: string;
+              minimumSelection?: number;
+              maximumSelection?: number;
+              allowRepeatableSelection?: boolean;
+              comboMenuItems: Array<{
+                uuid: string;
+                menuItemUuid: string;
+                name: string;
+              }>;
+            }>;
+          }>;
+        }>;
         __typename?: string;
       };
       __typename?: string;

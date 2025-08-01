@@ -16,7 +16,8 @@ const formatResponse = (operationType: 'ONLY_BROWSE' | 'TAKEOUT') => {
 
 const updateOnlineRestaurantStatus: IChefMcpTool = {
   name: 'updateOnlineRestaurantStatus',
-  description: '切換外帶外送的上下線狀態（operationType: ONLY_BROWSE=下線, TAKEOUT=上線）',
+  description:
+    '切換外帶外送的上下線狀態（operationType: ONLY_BROWSE=下線, TAKEOUT=上線）',
   category: 'menu',
   version: '1.0.0',
   inputSchema: {
@@ -32,16 +33,19 @@ const updateOnlineRestaurantStatus: IChefMcpTool = {
   },
   handler: async (args?: Record<string, unknown>): Promise<McpToolResponse> => {
     try {
-      const { operationType } = (args as unknown) as UpdateOnlineRestaurantStatusArgs;
-      if (!operationType || (operationType !== 'ONLY_BROWSE' && operationType !== 'TAKEOUT')) {
+      const { operationType } =
+        args as unknown as UpdateOnlineRestaurantStatusArgs;
+      if (
+        !operationType ||
+        (operationType !== 'ONLY_BROWSE' && operationType !== 'TAKEOUT')
+      ) {
         throw new Error('operationType 必須是 ONLY_BROWSE 或 TAKEOUT');
       }
       const client = createGraphQLClient();
       const payload = { operationType };
-      const data = await client.request(
-        ONLINE_RESTAURANT_INFORMATION_EDIT_MUTATION,
-        { payload }
-      );
+      await client.request(ONLINE_RESTAURANT_INFORMATION_EDIT_MUTATION, {
+        payload,
+      });
       return {
         content: [
           {
@@ -66,4 +70,4 @@ const updateOnlineRestaurantStatus: IChefMcpTool = {
   },
 };
 
-export default updateOnlineRestaurantStatus; 
+export default updateOnlineRestaurantStatus;

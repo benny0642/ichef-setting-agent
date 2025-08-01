@@ -1,14 +1,17 @@
 import { MENU_ITEM_CREATE_MUTATION } from '../api/gql/createMenuItemMutation.js';
 import { createGraphQLClient } from '../api/graphqlClient.js';
 import { IChefMcpTool, McpToolResponse } from '../types/mcpTypes.js';
-import { MenuItemCreateResponse } from '../types/menuTypes.js';
+import {
+  ComboItemCategoryInput,
+  MenuItemCreateResponse,
+} from '../types/menuTypes.js';
 
 // 商品新增參數介面
 interface CreateMenuItemArgs {
   name: string;
   price: number;
   menuItemCategoryUuid: string;
-  type?: 'ITEM' | 'COMBO_ITEM';
+  type?: 'item' | 'combo';
   enabled?: boolean;
   sortingIndex?: number;
   picture?: string;
@@ -16,6 +19,7 @@ interface CreateMenuItemArgs {
   customizedTaxEnabled?: boolean;
   customizedTaxType?: string;
   customizedTaxRate?: number;
+  comboItemCategories?: ComboItemCategoryInput[];
 }
 
 // 格式化新增成功回應的輔助函數
@@ -30,7 +34,7 @@ const formatCreateSuccessResponse = (
   result += `📝 商品名稱: ${args.name}\n`;
   result += `💰 價格: $${args.price}\n`;
   result += `📂 分類 UUID: ${args.menuItemCategoryUuid}\n`;
-  result += `🏷️ 類型: ${args.type === 'COMBO_ITEM' ? '套餐' : '單品'}\n`;
+  result += `🏷️ 類型: ${args.type === 'combo' ? '套餐' : '單品'}\n`;
   result += `🔄 狀態: ${args.enabled !== false ? '啟用' : '停用'}\n`;
 
   if (args.sortingIndex !== undefined) {
@@ -55,12 +59,32 @@ const formatCreateSuccessResponse = (
     }
   }
 
+  // 如果是套餐商品，顯示套餐結構
+  if (args.type === 'combo' && newItem.comboItemCategories) {
+    result += '\n📋 套餐結構:\n';
+    newItem.comboItemCategories.forEach((category, categoryIndex) => {
+      result += `\n📂 分類 ${categoryIndex + 1}: ${category.name}\n`;
+      result += `   ├─ 選擇規則: 最少 ${category.minimumSelection || 1} 項，最多 ${category.maximumSelection || 1} 項\n`;
+      result += `   ├─ 可重複選擇: ${category.allowRepeatableSelection ? '是' : '否'}\n`;
+      result += `   └─ 商品選項 (${category.comboMenuItems.length} 項):\n`;
+
+      category.comboMenuItems.forEach((item, itemIndex) => {
+        const priceDisplay =
+          item.price && parseFloat(item.price.toString()) > 0
+            ? ` (+$${item.price})`
+            : '';
+        result += `      ${itemIndex + 1}. ${item.name}${priceDisplay}\n`;
+      });
+    });
+  }
+
   return result;
 };
 
 const createMenuItem: IChefMcpTool = {
   name: 'createMenuItem',
-  description: '新增一個新的菜單商品項目，支援完整的商品資訊設定，要執行前請跟使用者說一聲「哈囉，我要執行了」。',
+  description:
+    '新增一個新的菜單商品項目，支援完整的商品資訊設定，要執行前請跟使用者說一聲「哈囉，我要執行了」。',
   category: 'menu',
   version: '1.0.0',
   inputSchema: {
@@ -85,9 +109,9 @@ const createMenuItem: IChefMcpTool = {
       },
       type: {
         type: 'string',
-        enum: ['ITEM', 'COMBO_ITEM'],
-        description: '商品類型（預設為 ITEM）',
-        default: 'ITEM',
+        enum: ['item', 'combo'],
+        description: '商品類型（預設為 item)',
+        default: 'item',
       },
       enabled: {
         type: 'boolean',
@@ -121,6 +145,61 @@ const createMenuItem: IChefMcpTool = {
         description: '自訂稅率（選填，百分比）',
         minimum: 0,
         maximum: 100,
+      },
+      comboItemCategories: {
+        type: 'array',
+        description: '套餐分類設定（選填，僅當 type 為 combo 時必填）',
+        items: {
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string',
+              description: '分類名稱（必填）',
+              minLength: 1,
+              maxLength: 255,
+            },
+            allowRepeatableSelection: {
+              type: 'boolean',
+              description: '是否允許重複選擇（選填，預設為 false）',
+              default: false,
+            },
+            minimumSelection: {
+              type: 'number',
+              description: '最少選擇數量（選填，預設為 1）',
+              minimum: 0,
+              default: 1,
+            },
+            maximumSelection: {
+              type: 'number',
+              description: '最多選擇數量（選填，預設為 1）',
+              minimum: 1,
+              default: 1,
+            },
+            comboMenuItems: {
+              type: 'array',
+              description: '套餐選項（必填）',
+              minItems: 1,
+              items: {
+                type: 'object',
+                properties: {
+                  menuItemUuid: {
+                    type: 'string',
+                    description: '商品 UUID（必填）',
+                    pattern:
+                      '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+                  },
+                  price: {
+                    type: 'string',
+                    description: '加價金額（選填，字串格式）',
+                    pattern: '^\\d+(\\.\\d{1,2})?$',
+                  },
+                },
+                required: ['menuItemUuid'],
+              },
+            },
+          },
+          required: ['name', 'comboMenuItems'],
+        },
       },
     },
     required: ['name', 'price', 'menuItemCategoryUuid'],
@@ -162,9 +241,109 @@ const createMenuItem: IChefMcpTool = {
       }
 
       // 驗證商品類型
-      const validTypes = ['ITEM', 'COMBO_ITEM'];
+      const validTypes = ['item', 'combo'];
       if (createArgs.type && !validTypes.includes(createArgs.type)) {
-        throw new Error('商品類型必須是 ITEM 或 COMBO_ITEM');
+        throw new Error('商品類型必須是 item 或 combo');
+      }
+
+      // 驗證套餐相關參數
+      if (createArgs.type === 'combo') {
+        if (
+          !createArgs.comboItemCategories ||
+          createArgs.comboItemCategories.length === 0
+        ) {
+          throw new Error('套餐商品必須設定至少一個分類');
+        }
+
+        // 驗證每個套餐分類
+        createArgs.comboItemCategories.forEach((category, categoryIndex) => {
+          if (
+            !category.name ||
+            typeof category.name !== 'string' ||
+            category.name.trim().length === 0
+          ) {
+            throw new Error(
+              `第 ${categoryIndex + 1} 個分類的名稱是必填項目且不能為空`
+            );
+          }
+
+          if (category.name.trim().length > 255) {
+            throw new Error(
+              `第 ${categoryIndex + 1} 個分類的名稱不能超過 255 個字元`
+            );
+          }
+
+          // 驗證選擇數量設定
+          const minSelection =
+            category.minimumSelection !== undefined
+              ? category.minimumSelection
+              : 1;
+          const maxSelection =
+            category.maximumSelection !== undefined
+              ? category.maximumSelection
+              : 1;
+
+          if (minSelection < 0) {
+            throw new Error(
+              `第 ${categoryIndex + 1} 個分類的最少選擇數量不能小於 0`
+            );
+          }
+
+          if (maxSelection < 1) {
+            throw new Error(
+              `第 ${categoryIndex + 1} 個分類的最多選擇數量不能小於 1`
+            );
+          }
+
+          if (maxSelection < minSelection) {
+            throw new Error(
+              `第 ${categoryIndex + 1} 個分類的最多選擇數量不能小於最少選擇數量`
+            );
+          }
+
+          // 驗證套餐選項
+          if (
+            !category.comboMenuItems ||
+            category.comboMenuItems.length === 0
+          ) {
+            throw new Error(
+              `第 ${categoryIndex + 1} 個分類必須設定至少一個商品選項`
+            );
+          }
+
+          category.comboMenuItems.forEach((item, itemIndex) => {
+            if (!item.menuItemUuid || typeof item.menuItemUuid !== 'string') {
+              throw new Error(
+                `第 ${categoryIndex + 1} 個分類的第 ${itemIndex + 1} 個商品選項的 UUID 是必填項目`
+              );
+            }
+
+            // 驗證商品 UUID 格式
+            if (!uuidRegex.test(item.menuItemUuid)) {
+              throw new Error(
+                `第 ${categoryIndex + 1} 個分類的第 ${itemIndex + 1} 個商品選項的 UUID 格式不正確`
+              );
+            }
+
+            // 驗證加價金額（如果有提供）
+            if (item.price !== undefined && item.price !== null) {
+              if (typeof item.price !== 'string') {
+                throw new Error(
+                  `第 ${categoryIndex + 1} 個分類的第 ${itemIndex + 1} 個商品選項的價格必須是字串格式`
+                );
+              }
+
+              const priceValue = parseFloat(item.price);
+              if (isNaN(priceValue) || priceValue < 0) {
+                throw new Error(
+                  `第 ${categoryIndex + 1} 個分類的第 ${itemIndex + 1} 個商品選項的價格必須是非負數`
+                );
+              }
+            }
+          });
+        });
+      } else if (createArgs.comboItemCategories) {
+        throw new Error('只有套餐商品（type: combo）可以設定套餐分類');
       }
 
       // 驗證排序索引
@@ -192,11 +371,11 @@ const createMenuItem: IChefMcpTool = {
       }
 
       // 構建 GraphQL mutation payload
-      const payload = {
+      const payload: Record<string, unknown> = {
         name: createArgs.name.trim(),
         price: createArgs.price.toString(), // API 需要字串格式的價格
         menuItemCategoryUuid: createArgs.menuItemCategoryUuid,
-        type: createArgs.type || 'ITEM',
+        type: createArgs.type || 'item',
         enabled: createArgs.enabled !== false,
         ...(createArgs.sortingIndex !== undefined && {
           sortingIndex: createArgs.sortingIndex,
@@ -213,6 +392,24 @@ const createMenuItem: IChefMcpTool = {
           customizedTaxRate: createArgs.customizedTaxRate.toString(),
         }),
       };
+
+      // 如果是套餐商品，添加套餐分類資料
+      if (createArgs.type === 'combo' && createArgs.comboItemCategories) {
+        payload.comboItemCategories = createArgs.comboItemCategories.map(
+          category => ({
+            name: category.name.trim(),
+            allowRepeatableSelection:
+              category.allowRepeatableSelection || false,
+            minimumSelection: category.minimumSelection || 1,
+            maximumSelection: category.maximumSelection || 1,
+            comboMenuItemSortingType: 'DEFAULT',
+            comboMenuItems: (category.comboMenuItems || []).map(item => ({
+              menuItemUuid: item.menuItemUuid,
+              ...(item.price && { price: item.price }),
+            })),
+          })
+        );
+      }
 
       // 建立 GraphQL 客戶端
       const client = createGraphQLClient();
@@ -284,6 +481,16 @@ const createMenuItem: IChefMcpTool = {
         errorMessage.includes('分類')
       ) {
         errorMessage = '❌ 商品分類不存在或無效，請檢查分類 UUID 是否正確';
+      } else if (
+        errorMessage.includes('combo') ||
+        errorMessage.includes('套餐')
+      ) {
+        errorMessage = '❌ 套餐設定有誤，請檢查套餐分類和選項設定是否正確';
+      } else if (
+        errorMessage.includes('menuItemUuid') ||
+        errorMessage.includes('商品選項')
+      ) {
+        errorMessage = '❌ 套餐中的商品選項 UUID 無效，請檢查商品是否存在';
       }
 
       return {

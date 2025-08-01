@@ -4,6 +4,7 @@
 
 import {
   BatchOperationResult,
+  ComboItemCategoryInput,
   CreateMenuItemPayload,
   CustomizedTaxType,
   MenuItemCategoryType,
@@ -93,7 +94,7 @@ export function convertMenuListingToDisplayFormat(
 export function convertToCreateMenuItemPayload(input: {
   name: string;
   price: number;
-  type: 'ITEM' | 'COMBO_ITEM';
+  type: 'item' | 'combo';
   categoryUuid: UUID;
   enabled?: boolean;
   sortingIndex?: number;
@@ -124,7 +125,7 @@ export function convertToCreateMenuItemPayload(input: {
 export function convertToUpdateMenuItemPayload(input: {
   name?: string;
   price?: number;
-  type?: 'ITEM' | 'COMBO_ITEM';
+  type?: 'item' | 'combo';
   categoryUuid?: UUID;
   enabled?: boolean;
   sortingIndex?: number;
@@ -133,6 +134,7 @@ export function convertToUpdateMenuItemPayload(input: {
   customizedTaxEnabled?: boolean;
   customizedTaxType?: 'PERCENTAGE' | 'FIXED';
   customizedTaxRate?: number;
+  comboItemCategories?: ComboItemCategoryInput[];
 }): UpdateMenuItemPayload {
   const payload: UpdateMenuItemPayload = {};
 
@@ -168,6 +170,9 @@ export function convertToUpdateMenuItemPayload(input: {
   }
   if (input.customizedTaxRate !== undefined) {
     payload.customizedTaxRate = input.customizedTaxRate;
+  }
+  if (input.comboItemCategories !== undefined) {
+    payload.comboItemCategories = input.comboItemCategories;
   }
 
   return payload;
