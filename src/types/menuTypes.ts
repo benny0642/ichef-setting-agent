@@ -535,3 +535,36 @@ export interface ImportResult {
     error: string;
   }>;
 }
+
+// 套餐依賴檢查回應
+export interface ComboDependencyCheckResponse {
+  restaurant: {
+    settings: {
+      menu: {
+        menuItemCategories: Array<{
+          menuItems: Array<{
+            uuid: string;
+            name: string;
+            type: string;
+            enabled: boolean;
+            comboItemCategories?: Array<{
+              uuid: string;
+              name: string;
+              minimumSelection?: number;
+              maximumSelection?: number;
+              allowRepeatableSelection?: boolean;
+              comboMenuItems: Array<{
+                uuid: string;
+                menuItemUuid: string;
+                name: string;
+              }>;
+            }>;
+          }>;
+        }>;
+        __typename?: string;
+      };
+      __typename?: string;
+    };
+    __typename?: string;
+  };
+}

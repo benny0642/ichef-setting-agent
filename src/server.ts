@@ -1,15 +1,16 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import {
-  CallToolRequestSchema,
-  GetPromptRequestSchema,
-  ListPromptsRequestSchema,
-  ListResourcesRequestSchema,
-  ListToolsRequestSchema,
-  ReadResourceRequestSchema,
+    CallToolRequestSchema,
+    GetPromptRequestSchema,
+    ListPromptsRequestSchema,
+    ListResourcesRequestSchema,
+    ListToolsRequestSchema,
+    ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import winston from 'winston';
 import batchDeleteOnlineRestaurantMenuItems from './tools/batchDeleteOnlineRestaurantMenuItems.js';
 import createMenuItem from './tools/createMenuItem.js';
+import deleteMenuItem from './tools/deleteMenuItem.js';
 import getAllMenuItems from './tools/getAllMenuItems.js';
 import getMenuItemDetails from './tools/getMenuItemDetails.js';
 import getMenuItemTags from './tools/getMenuItemTags.js';
@@ -55,6 +56,7 @@ const server = new Server(
 const tools = [
   getAllMenuItems,
   createMenuItem,
+  deleteMenuItem,
   updateMenuItem,
   updateSoldOutMenuItem,
   getMenuItemDetails,
