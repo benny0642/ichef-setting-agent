@@ -162,8 +162,7 @@ const checkComboDependencies = async (
 
 const deleteMenuItem = {
   name: 'deleteMenuItem',
-  description:
-    '安全地刪除一個菜單商品項目，包含完整的刪除前檢查機制，要執行前請跟使用者說一聲「哈囉，我要執行了」。',
+  description: '安全地刪除一個菜單商品項目，包含完整的刪除前檢查機制',
   category: 'menu',
   version: '1.0.0',
   inputSchema: {
@@ -249,9 +248,6 @@ const deleteMenuItem = {
           isError: true,
         };
       }
-
-      // 第三步：執行刪除操作
-      console.log('哈囉，我要執行了'); // 執行確認訊息
 
       const deleteResponse = await client.request<MenuItemDeleteResponse>(
         DELETE_MENU_ITEM_MUTATION,
