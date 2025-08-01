@@ -8,6 +8,7 @@ import {
   ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import winston from 'winston';
+import batchDeleteOnlineRestaurantMenuItems from './tools/batchDeleteOnlineRestaurantMenuItems.js';
 import createMenuItem from './tools/createMenuItem.js';
 import getAllMenuItems from './tools/getAllMenuItems.js';
 import getMenuItemDetails from './tools/getMenuItemDetails.js';
@@ -60,6 +61,7 @@ const tools = [
   getMenuItemTags,
   getOnlineRestaurantMenuItemListing,
   updateOnlineRestaurantStatus,
+  batchDeleteOnlineRestaurantMenuItems,
   importMenuItemToOnlineRestaurant,
 ];
 

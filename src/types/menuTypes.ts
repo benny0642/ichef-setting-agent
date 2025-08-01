@@ -71,8 +71,8 @@ export interface ItemTagRelationshipType {
   __typename?: string;
 }
 
-// 線上餐廳商品介面
-export interface OnlineRestaurantMenuItem {
+// 線上餐廳商品關聯介面
+export interface OnlineRestaurantMenuItemAssociation {
   uuid: UUID;
   visible?: boolean;
   __typename?: string;
@@ -91,9 +91,9 @@ export interface ComboMenuItem {
   name: string;
   price: number;
   menuItemUuid: UUID;
-  onlineRestaurantMenuItem?: OnlineRestaurantMenuItem;
-  instoreOrderingMenuItem?: OnlineRestaurantMenuItem;
-  ubereatsV2MenuItem?: OnlineRestaurantMenuItem;
+  onlineRestaurantMenuItem?: OnlineRestaurantMenuItemAssociation;
+  instoreOrderingMenuItem?: OnlineRestaurantMenuItemAssociation;
+  ubereatsV2MenuItem?: OnlineRestaurantMenuItemAssociation;
   __typename?: string;
 }
 
@@ -147,11 +147,11 @@ export interface MenuItemType {
   comboItemCategoryUuidsMappedWithOnlineOrdering: {
     ubereats: string;
   };
-  onlineRestaurantMenuItem?: OnlineRestaurantMenuItem;
-  grabfoodMenuItem?: OnlineRestaurantMenuItem;
-  ubereatsMenuItem?: OnlineRestaurantMenuItem;
-  ubereatsV2MenuItem?: OnlineRestaurantMenuItem;
-  foodpandaMenuItem?: OnlineRestaurantMenuItem;
+  onlineRestaurantMenuItem?: OnlineRestaurantMenuItemAssociation;
+  grabfoodMenuItem?: OnlineRestaurantMenuItemAssociation;
+  ubereatsMenuItem?: OnlineRestaurantMenuItemAssociation;
+  ubereatsV2MenuItem?: OnlineRestaurantMenuItemAssociation;
+  foodpandaMenuItem?: OnlineRestaurantMenuItemAssociation;
   itemTagRelationshipList?: ItemTagRelationshipType[];
   __typename?: string;
 }
@@ -447,6 +447,34 @@ export interface MenuItemTagListingResponse {
       menu: {
         menuItemTags: MenuItemTagType[];
         tagGroups: TagGroupType[];
+        __typename?: string;
+      };
+      __typename?: string;
+    };
+    __typename?: string;
+  };
+}
+
+// 批次刪除相關型別
+export interface BatchDeleteMenuItemArgs {
+  menuItemUuids: string[];
+}
+
+export interface BatchDeleteMenuItemResponse {
+  restaurant: {
+    settings: {
+      menu: {
+        integration: {
+          onlineRestaurant: {
+            deleteMenu: {
+              deletedCategoryUuids?: UUID[];
+              deletedMenuItemUuids?: UUID[];
+              __typename?: string;
+            };
+            __typename?: string;
+          };
+          __typename?: string;
+        };
         __typename?: string;
       };
       __typename?: string;
