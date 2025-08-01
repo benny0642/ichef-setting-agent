@@ -11,6 +11,7 @@ export { ONLINE_RESTAURANT_MENU_ITEM_LISTING_QUERY } from './onlineRestaurantMen
 
 // 變更 (Mutations)
 export { MENU_ITEM_CREATE_MUTATION } from './createMenuItemMutation.js';
+export { MENU_ITEM_CATEGORY_CREATE_MUTATION } from './createMenuItemCategoryMutation.js';
 export { DELETE_MENU_ITEM_MUTATION } from './deleteMenuItemMutation.js';
 export { ONLINE_RESTAURANT_MENU_ITEM_BATCH_DELETE_MUTATION } from './onlineRestaurantMenuItemBatchDeleteMutation.js';
 export { ONLINE_RESTAURANT_MENU_ITEM_IMPORT_MUTATION } from './onlineRestaurantMenuItemImportMutation.js';
@@ -19,6 +20,7 @@ export { MENU_ITEM_UPDATE_MUTATION } from './updateMenuItemMutation.js';
 // 匯入所有定義用於物件分類
 import { COMBO_DEPENDENCY_CHECK_QUERY } from './comboDependencyCheckQuery.js';
 import { MENU_ITEM_CREATE_MUTATION } from './createMenuItemMutation.js';
+import { MENU_ITEM_CATEGORY_CREATE_MUTATION } from './createMenuItemCategoryMutation.js';
 import { DELETE_MENU_ITEM_MUTATION } from './deleteMenuItemMutation.js';
 import { MENU_ITEM_LISTING_QUERY } from './menuItemListingQuery.js';
 import { MENU_ITEM_QUERY } from './menuItemQuery.js';
@@ -47,6 +49,8 @@ export const GraphQLOperations = {
     MENU_ITEM_CREATE_MUTATION,
     MENU_ITEM_UPDATE_MUTATION,
     DELETE_MENU_ITEM_MUTATION,
+    // 分類 CRUD
+    MENU_ITEM_CATEGORY_CREATE_MUTATION,
     ONLINE_RESTAURANT_MENU_ITEM_BATCH_DELETE_MUTATION,
     // 商品匯入
     ONLINE_RESTAURANT_MENU_ITEM_IMPORT_MUTATION,
