@@ -85,9 +85,9 @@ const createMenuItem: IChefMcpTool = {
       },
       type: {
         type: 'string',
-        enum: ['ITEM', 'COMBO_ITEM'],
-        description: '商品類型（預設為 ITEM）',
-        default: 'ITEM',
+        enum: ['item', 'combo'],
+        description: '商品類型（預設為 item)',
+        default: 'item',
       },
       enabled: {
         type: 'boolean',
@@ -162,9 +162,9 @@ const createMenuItem: IChefMcpTool = {
       }
 
       // 驗證商品類型
-      const validTypes = ['ITEM', 'COMBO_ITEM'];
+      const validTypes = ['item', 'combo'];
       if (createArgs.type && !validTypes.includes(createArgs.type)) {
-        throw new Error('商品類型必須是 ITEM 或 COMBO_ITEM');
+        throw new Error('商品類型必須是 item 或 combo');
       }
 
       // 驗證排序索引
