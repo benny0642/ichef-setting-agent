@@ -3,6 +3,7 @@
  */
 
 import {
+  ComboMenuItemSortingType,
   CreateMenuItemPayload,
   CustomizedTaxType,
   MenuItemListingResponse,
@@ -321,6 +322,141 @@ export function validateCreateMenuItemPayload(
 }
 
 /**
+ * 驗證套餐商品輸入
+ */
+export function validateComboMenuItemInput(
+  comboMenuItem: unknown
+): MenuItemValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (!comboMenuItem || typeof comboMenuItem !== 'object') {
+    errors.push('套餐商品資料必須是物件');
+    return { isValid: false, errors, warnings };
+  }
+
+  const item = comboMenuItem as Record<string, unknown>;
+
+  // 驗證 menuItemUuid（必填）
+  if (!item.menuItemUuid || !isValidUUID(item.menuItemUuid)) {
+    errors.push('套餐商品的 menuItemUuid 必須是有效的 UUID');
+  }
+
+  // 驗證 uuid（選填，更新時使用）
+  if (item.uuid !== undefined && !isValidUUID(item.uuid)) {
+    errors.push('套餐商品的 uuid 必須是有效的 UUID');
+  }
+
+  // 驗證 price（選填）
+  if (item.price !== undefined) {
+    if (typeof item.price !== 'string') {
+      errors.push('套餐商品的加價必須是字串格式');
+    } else {
+      const priceNum = parseFloat(item.price);
+      if (isNaN(priceNum) || priceNum < 0) {
+        errors.push('套餐商品的加價必須是非負數');
+      }
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings,
+  };
+}
+
+/**
+ * 驗證套餐分類輸入
+ */
+export function validateComboItemCategoryInput(
+  category: unknown
+): MenuItemValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (!category || typeof category !== 'object') {
+    errors.push('套餐分類資料必須是物件');
+    return { isValid: false, errors, warnings };
+  }
+
+  const cat = category as Record<string, unknown>;
+
+  // 驗證 name（必填）
+  if (!cat.name || typeof cat.name !== 'string') {
+    errors.push('套餐分類名稱必須是非空字串');
+  } else if (cat.name.trim().length === 0) {
+    errors.push('套餐分類名稱不能為空');
+  } else if (cat.name.length > 255) {
+    errors.push('套餐分類名稱不能超過 255 個字元');
+  }
+
+  // 驗證 uuid（選填，更新時使用）
+  if (cat.uuid !== undefined && !isValidUUID(cat.uuid)) {
+    errors.push('套餐分類的 uuid 必須是有效的 UUID');
+  }
+
+  // 驗證 allowRepeatableSelection（必填）
+  if (typeof cat.allowRepeatableSelection !== 'boolean') {
+    errors.push('allowRepeatableSelection 必須是布林值');
+  }
+
+  // 驗證 minimumSelection（必填）
+  if (typeof cat.minimumSelection !== 'number' || cat.minimumSelection < 0) {
+    errors.push('minimumSelection 必須是非負整數');
+  }
+
+  // 驗證 maximumSelection（必填）
+  if (typeof cat.maximumSelection !== 'number' || cat.maximumSelection < 0) {
+    errors.push('maximumSelection 必須是非負整數');
+  }
+
+  // 驗證選擇範圍邏輯
+  if (
+    typeof cat.minimumSelection === 'number' &&
+    typeof cat.maximumSelection === 'number' &&
+    cat.minimumSelection > cat.maximumSelection
+  ) {
+    errors.push('minimumSelection 不能大於 maximumSelection');
+  }
+
+  // 驗證 comboMenuItemSortingType（選填）
+  if (
+    cat.comboMenuItemSortingType !== undefined &&
+    typeof cat.comboMenuItemSortingType === 'string' &&
+    !Object.values(ComboMenuItemSortingType).includes(
+      cat.comboMenuItemSortingType as ComboMenuItemSortingType
+    )
+  ) {
+    errors.push('comboMenuItemSortingType 必須是有效的排序類型');
+  }
+
+  // 驗證 comboMenuItems（選填陣列）
+  if (cat.comboMenuItems !== undefined) {
+    if (!Array.isArray(cat.comboMenuItems)) {
+      errors.push('comboMenuItems 必須是陣列');
+    } else {
+      cat.comboMenuItems.forEach((item, index) => {
+        const itemValidation = validateComboMenuItemInput(item);
+        if (!itemValidation.isValid) {
+          errors.push(
+            ...itemValidation.errors.map(
+              error => `第 ${index + 1} 個套餐商品: ${error}`
+            )
+          );
+        }
+      });
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings,
+  };
+}
+
+/**
  * 驗證更新商品的 Payload
  */
 export function validateUpdateMenuItemPayload(
@@ -413,6 +549,24 @@ export function validateUpdateMenuItemPayload(
     typeof updatePayload.customizedTaxRate !== 'number'
   ) {
     errors.push('自訂稅率必須是數字');
+  }
+
+  // 驗證 comboItemCategories（選填陣列）
+  if (updatePayload.comboItemCategories !== undefined) {
+    if (!Array.isArray(updatePayload.comboItemCategories)) {
+      errors.push('comboItemCategories 必須是陣列');
+    } else {
+      updatePayload.comboItemCategories.forEach((category, index) => {
+        const categoryValidation = validateComboItemCategoryInput(category);
+        if (!categoryValidation.isValid) {
+          errors.push(
+            ...categoryValidation.errors.map(
+              error => `第 ${index + 1} 個套餐分類: ${error}`
+            )
+          );
+        }
+      });
+    }
   }
 
   return {

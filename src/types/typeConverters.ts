@@ -4,6 +4,7 @@
 
 import {
   BatchOperationResult,
+  ComboItemCategoryInput,
   CreateMenuItemPayload,
   CustomizedTaxType,
   MenuItemCategoryType,
@@ -133,6 +134,7 @@ export function convertToUpdateMenuItemPayload(input: {
   customizedTaxEnabled?: boolean;
   customizedTaxType?: 'PERCENTAGE' | 'FIXED';
   customizedTaxRate?: number;
+  comboItemCategories?: ComboItemCategoryInput[];
 }): UpdateMenuItemPayload {
   const payload: UpdateMenuItemPayload = {};
 
@@ -168,6 +170,9 @@ export function convertToUpdateMenuItemPayload(input: {
   }
   if (input.customizedTaxRate !== undefined) {
     payload.customizedTaxRate = input.customizedTaxRate;
+  }
+  if (input.comboItemCategories !== undefined) {
+    payload.comboItemCategories = input.comboItemCategories;
   }
 
   return payload;
