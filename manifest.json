@@ -1,0 +1,38 @@
+{
+  "dxt_version": "0.1",
+  "name": "ichef-setting-agent",
+  "version": "1.0.0",
+  "description": "you can use this agent to set ichef menu",
+  "author": {
+    "name": "Benny"
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/build/index.js"],
+      "env": {
+        "GRAPHQL_ENDPOINT": "${user_config.GRAPHQL_ENDPOINT}",
+        "GRAPHQL_TOKEN": "${user_config.GRAPHQL_TOKEN}"
+      }
+    }
+  },
+  "user_config": {
+    "GRAPHQL_ENDPOINT": {
+      "type": "string",
+      "title": "your team stack endpoint",
+      "description": "such as https://rd2.ichef.tw/api/graphql/",
+      "required": true,
+      "sensitive": true
+    },
+    "GRAPHQL_TOKEN": {
+      "type": "string",
+      "title": "api token",
+      "description": "add api token",
+      "required": true,
+      "sensitive": true
+    }
+  },
+  "license": "ISC"
+}

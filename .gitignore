@@ -4,3 +4,4 @@ build/
 schema.json
 src/types/generated.ts
 .DS_Store
+ichef-setting-agent.dxt
