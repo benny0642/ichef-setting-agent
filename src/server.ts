@@ -13,6 +13,7 @@ import getAllMenuItems from './tools/getAllMenuItems.js';
 import getMenuItemDetails from './tools/getMenuItemDetails.js';
 import getMenuItemTags from './tools/getMenuItemTags.js';
 import updateMenuItem from './tools/updateMenuItem.js';
+import updateOnlineRestaurantStatus from './tools/updateOnlineRestaurantStatus.js';
 import updateSoldOutMenuItem from './tools/updateSoldOutMenuItem.js';
 
 // 設定日誌記錄器 - 輸出到 stderr 避免干擾 MCP 協議
@@ -55,6 +56,7 @@ const tools = [
   updateSoldOutMenuItem,
   getMenuItemDetails,
   getMenuItemTags,
+  updateOnlineRestaurantStatus,
 ];
 
 // 系統資源列表
