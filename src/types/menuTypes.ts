@@ -88,6 +88,7 @@ export interface OriginalPicture {
 // 套餐商品介面
 export interface ComboMenuItem {
   uuid: UUID;
+  name: string;
   price: number;
   menuItemUuid: UUID;
   onlineRestaurantMenuItem?: OnlineRestaurantMenuItem;
