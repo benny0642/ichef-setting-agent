@@ -532,8 +532,8 @@ const updateMenuItem: IChefMcpTool = {
       // 驗證套餐子項目（僅套餐商品可用）
       if (updateArgs.comboItemCategories !== undefined) {
         // 檢查商品類型是否為套餐
-        if (updateArgs.type !== undefined && updateArgs.type !== 'COMBO_ITEM') {
-          throw new Error('只有套餐商品（COMBO_ITEM）可以設定套餐子項目');
+        if (updateArgs.type !== undefined && updateArgs.type !== 'combo') {
+          throw new Error('只有套餐商品（combo）可以設定套餐子項目');
         }
 
         if (!Array.isArray(updateArgs.comboItemCategories)) {

@@ -403,10 +403,11 @@ const createMenuItem: IChefMcpTool = {
             minimumSelection: category.minimumSelection || 1,
             maximumSelection: category.maximumSelection || 1,
             comboMenuItemSortingType: 'DEFAULT',
-            comboMenuItems: category.comboMenuItems.map(item => ({
-              menuItemUuid: item.menuItemUuid,
-              ...(item.price && { price: item.price }),
-            })),
+            comboMenuItems:
+              category.comboMenuItems?.map(item => ({
+                menuItemUuid: item.menuItemUuid,
+                ...(item.price && { price: item.price }),
+              })) || [],
           })
         );
       }

@@ -252,7 +252,8 @@ export interface ComboItemCategoryInput {
   allowRepeatableSelection?: boolean;
   minimumSelection?: number;
   maximumSelection?: number;
-  comboMenuItems: ComboMenuItemInput[];
+  comboMenuItemSortingType?: ComboMenuItemSortingType;
+  comboMenuItems?: ComboMenuItemInput[];
 }
 
 // 新增商品 Payload
@@ -270,24 +271,6 @@ export interface CreateMenuItemPayload {
   customizedTaxRate?: number;
   itemTagRelationshipList?: ItemTagRelationshipPayload[];
   comboItemCategories?: ComboItemCategoryInput[];
-}
-
-// 套餐商品輸入介面
-export interface ComboMenuItemInput {
-  uuid?: UUID; // 用於更新現有子商品
-  menuItemUuid: UUID; // 關聯的單品商品 UUID
-  price?: string; // 加價金額（字串格式）
-}
-
-// 套餐分類輸入介面
-export interface ComboItemCategoryInput {
-  uuid?: UUID; // 用於更新現有分類
-  name: string;
-  allowRepeatableSelection: boolean;
-  minimumSelection: number;
-  maximumSelection: number;
-  comboMenuItemSortingType?: ComboMenuItemSortingType;
-  comboMenuItems?: ComboMenuItemInput[];
 }
 
 // 更新商品 Payload
@@ -411,6 +394,34 @@ export interface MenuItemTagListingResponse {
       menu: {
         menuItemTags: MenuItemTagType[];
         tagGroups: TagGroupType[];
+        __typename?: string;
+      };
+      __typename?: string;
+    };
+    __typename?: string;
+  };
+}
+
+// 批次刪除相關型別
+export interface BatchDeleteMenuItemArgs {
+  menuItemUuids: string[];
+}
+
+export interface BatchDeleteMenuItemResponse {
+  restaurant: {
+    settings: {
+      menu: {
+        integration: {
+          onlineRestaurant: {
+            deleteMenu: {
+              deletedCategoryUuids?: UUID[];
+              deletedMenuItemUuids?: UUID[];
+              __typename?: string;
+            };
+            __typename?: string;
+          };
+          __typename?: string;
+        };
         __typename?: string;
       };
       __typename?: string;
