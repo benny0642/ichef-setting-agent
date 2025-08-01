@@ -454,3 +454,56 @@ export interface MenuItemTagListingResponse {
     __typename?: string;
   };
 }
+
+// 線上餐廳商品匯入相關類型
+export interface OnlineRestaurantMenuItemImportResponse {
+  restaurant: {
+    settings: {
+      menu: {
+        integration: {
+          onlineRestaurant: {
+            importMenuItemToCategory?: Array<{
+              uuid: UUID;
+              name: string;
+              menuItems: Array<{
+                uuid: UUID;
+                ichefUuid: UUID;
+                originalName: string;
+                __typename?: string;
+              }>;
+              __typename?: string;
+            }> | null;
+            __typename?: string;
+          };
+          __typename?: string;
+        };
+        __typename?: string;
+      };
+      __typename?: string;
+    };
+    __typename?: string;
+  };
+}
+
+// 匯入商品參數
+export interface ImportMenuItemArgs {
+  categoryUuid: string;
+  ichefMenuItemUuids: string[];
+}
+
+// 匯入結果統計
+export interface ImportResult {
+  total: number;
+  successful: number;
+  skipped: number;
+  failed: number;
+  successfulItems: string[];
+  skippedItems: Array<{
+    uuid: string;
+    reason: string;
+  }>;
+  failedItems: Array<{
+    uuid: string;
+    error: string;
+  }>;
+}

@@ -1,5 +1,4 @@
 schema: './schema.json'
-documents: 'src/api/gql/**/*.ts'
 generates:
   src/types/generated.ts:
     plugins:
