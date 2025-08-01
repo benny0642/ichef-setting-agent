@@ -152,7 +152,7 @@ function formatSuccessResponse(
  * 批次刪除線上餐廳菜單項目工具
  */
 const batchDeleteOnlineRestaurantMenuItems: IChefMcpTool = {
-  name: 'batch-delete-online-restaurant-menu-items',
+  name: 'batchDeleteOnlineRestaurantMenuItems',
   description:
     '批次下架線上餐廳菜單項目，一次可下架多個項目。請注意：此操作會立即執行且無法復原。',
   category: 'menu',
@@ -215,7 +215,7 @@ const batchDeleteOnlineRestaurantMenuItems: IChefMcpTool = {
     } catch (error) {
       // 使用統一的錯誤處理機制
       const errorResult = handleError(error, {
-        tool: 'batch-delete-online-restaurant-menu-items',
+        tool: 'batchDeleteOnlineRestaurantMenuItems',
         operation: 'batch_delete',
       });
 

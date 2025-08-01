@@ -11,7 +11,6 @@ import {
   MenuItemValidationResult,
   OnlineRestaurantMenuCategory,
   OnlineRestaurantMenuItem,
-  OnlineRestaurantMenuItemAssociation,
   UpdateMenuItemPayload,
   UUID,
 } from './menuTypes.js';
