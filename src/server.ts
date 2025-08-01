@@ -9,6 +9,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import winston from 'winston';
 import createMenuItem from './tools/createMenuItem.js';
+import createMenuItemCategory from './tools/createMenuItemCategory.js';
 import getAllMenuItems from './tools/getAllMenuItems.js';
 import getMenuItemDetails from './tools/getMenuItemDetails.js';
 import getMenuItemTags from './tools/getMenuItemTags.js';
@@ -52,6 +53,7 @@ const server = new Server(
 const tools = [
   getAllMenuItems,
   createMenuItem,
+  createMenuItemCategory,
   updateMenuItem,
   updateSoldOutMenuItem,
   getMenuItemDetails,
