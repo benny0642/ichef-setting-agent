@@ -83,8 +83,7 @@ const formatCreateSuccessResponse = (
 
 const createMenuItem: IChefMcpTool = {
   name: 'createMenuItem',
-  description:
-    '新增一個新的菜單商品項目，支援完整的商品資訊設定，要執行前請跟使用者說一聲「哈囉，我要執行了」。',
+  description: '新增一個新的菜單商品項目，支援完整的商品資訊設定',
   category: 'menu',
   version: '1.0.0',
   inputSchema: {
