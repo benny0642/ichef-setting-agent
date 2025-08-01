@@ -118,13 +118,13 @@ const formatUpdateSuccessResponse = (
   // 顯示套餐結構更新資訊
   if (args.comboItemCategories !== undefined) {
     updatedFields.push(
-      `📋 套餐結構: 已更新 ${args.comboItemCategories.length} 個分類`
+      `📋 套餐結構: 已更新 ${args.comboItemCategories.length} 個子項目`
     );
 
     if (args.comboItemCategories.length > 0) {
-      updatedFields.push(`   套餐分類詳情:`);
+      updatedFields.push(`   套餐子項目詳情:`);
       args.comboItemCategories.forEach((category, index) => {
-        updatedFields.push(`     📂 分類 ${index + 1}: ${category.name}`);
+        updatedFields.push(`     📂 子項目 ${index + 1}: ${category.name}`);
         updatedFields.push(
           `        ├─ 選擇規則: 最少 ${category.minimumSelection} 項，最多 ${category.maximumSelection} 項`
         );
@@ -140,16 +140,16 @@ const formatUpdateSuccessResponse = (
 
         if (category.comboMenuItems && category.comboMenuItems.length > 0) {
           updatedFields.push(
-            `        └─ 子商品數量: ${category.comboMenuItems.length} 項`
+            `        └─ 可選品項數量: ${category.comboMenuItems.length} 項`
           );
           category.comboMenuItems.forEach((item, itemIndex) => {
             const priceText = item.price ? ` - 加價 $${item.price}` : '';
             updatedFields.push(
-              `           ${itemIndex + 1}. 🍔 商品 UUID: ${item.menuItemUuid}${priceText}`
+              `           ${itemIndex + 1}. 🍔 品項 UUID: ${item.menuItemUuid}${priceText}`
             );
           });
         } else {
-          updatedFields.push(`        └─ 子商品數量: 0 項`);
+          updatedFields.push(`        └─ 可選品項數量: 0 項`);
         }
 
         if (index < (args.comboItemCategories?.length ?? 0) - 1) {
@@ -287,19 +287,19 @@ const updateMenuItem: IChefMcpTool = {
       },
       comboItemCategories: {
         type: 'array',
-        description: '套餐分類列表（選填，僅套餐商品可用）',
+        description: '套餐子項目列表（選填，僅套餐商品可用）',
         items: {
           type: 'object',
           properties: {
             uuid: {
               type: 'string',
-              description: '套餐分類 UUID（更新時選填）',
+              description: '套餐子項目 UUID（更新時選填）',
               pattern:
                 '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
             },
             name: {
               type: 'string',
-              description: '套餐分類名稱（必填）',
+              description: '套餐子項目名稱（必填）',
               minLength: 1,
               maxLength: 255,
             },
@@ -320,17 +320,17 @@ const updateMenuItem: IChefMcpTool = {
             comboMenuItemSortingType: {
               type: 'string',
               enum: ['MANUAL', 'ALPHABETICAL'],
-              description: '套餐商品排序類型（選填）',
+              description: '套餐子項目的可選品項排序類型（選填）',
             },
             comboMenuItems: {
               type: 'array',
-              description: '套餐子商品列表（選填）',
+              description: '套餐子項目的可選品項列表（選填）',
               items: {
                 type: 'object',
                 properties: {
                   uuid: {
                     type: 'string',
-                    description: '套餐子商品 UUID（更新時選填）',
+                    description: '套餐子項目的可選品項 UUID（更新時選填）',
                     pattern:
                       '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
                   },
@@ -531,40 +531,40 @@ const updateMenuItem: IChefMcpTool = {
         }
       }
 
-      // 驗證套餐分類（僅套餐商品可用）
+      // 驗證套餐子項目（僅套餐商品可用）
       if (updateArgs.comboItemCategories !== undefined) {
         // 檢查商品類型是否為套餐
         if (updateArgs.type !== undefined && updateArgs.type !== 'COMBO_ITEM') {
-          throw new Error('只有套餐商品（COMBO_ITEM）可以設定套餐分類');
+          throw new Error('只有套餐商品（COMBO_ITEM）可以設定套餐子項目');
         }
 
         if (!Array.isArray(updateArgs.comboItemCategories)) {
-          throw new Error('套餐分類列表必須是陣列');
+          throw new Error('套餐子項目列表必須是陣列');
         }
 
         for (let i = 0; i < updateArgs.comboItemCategories.length; i++) {
           const category = updateArgs.comboItemCategories[i];
 
-          // 驗證分類名稱
+          // 驗證子項目名稱
           if (!category.name || typeof category.name !== 'string') {
-            throw new Error(`第 ${i + 1} 個套餐分類名稱必須是非空字串`);
+            throw new Error(`第 ${i + 1} 個套餐子項目名稱必須是非空字串`);
           }
           if (category.name.trim().length === 0) {
-            throw new Error(`第 ${i + 1} 個套餐分類名稱不能為空`);
+            throw new Error(`第 ${i + 1} 個套餐子項目名稱不能為空`);
           }
           if (category.name.length > 255) {
-            throw new Error(`第 ${i + 1} 個套餐分類名稱不能超過 255 個字元`);
+            throw new Error(`第 ${i + 1} 個套餐子項目名稱不能超過 255 個字元`);
           }
 
           // 驗證 UUID（更新時選填）
           if (category.uuid !== undefined && !uuidRegex.test(category.uuid)) {
-            throw new Error(`第 ${i + 1} 個套餐分類的 UUID 格式不正確`);
+            throw new Error(`第 ${i + 1} 個套餐子項目的 UUID 格式不正確`);
           }
 
           // 驗證必填布林值
           if (typeof category.allowRepeatableSelection !== 'boolean') {
             throw new Error(
-              `第 ${i + 1} 個套餐分類的 allowRepeatableSelection 必須是布林值`
+              `第 ${i + 1} 個套餐子項目的 allowRepeatableSelection 必須是布林值`
             );
           }
 
@@ -574,7 +574,7 @@ const updateMenuItem: IChefMcpTool = {
             category.minimumSelection < 0
           ) {
             throw new Error(
-              `第 ${i + 1} 個套餐分類的 minimumSelection 必須是非負整數`
+              `第 ${i + 1} 個套餐子項目的 minimumSelection 必須是非負整數`
             );
           }
 
@@ -583,13 +583,13 @@ const updateMenuItem: IChefMcpTool = {
             category.maximumSelection < 0
           ) {
             throw new Error(
-              `第 ${i + 1} 個套餐分類的 maximumSelection 必須是非負整數`
+              `第 ${i + 1} 個套餐子項目的 maximumSelection 必須是非負整數`
             );
           }
 
           if (category.minimumSelection > category.maximumSelection) {
             throw new Error(
-              `第 ${i + 1} 個套餐分類的 minimumSelection 不能大於 maximumSelection`
+              `第 ${i + 1} 個套餐子項目的 minimumSelection 不能大於 maximumSelection`
             );
           }
 
@@ -601,15 +601,15 @@ const updateMenuItem: IChefMcpTool = {
             )
           ) {
             throw new Error(
-              `第 ${i + 1} 個套餐分類的 comboMenuItemSortingType 必須是 MANUAL 或 ALPHABETICAL`
+              `第 ${i + 1} 個套餐子項目的 comboMenuItemSortingType 必須是 MANUAL 或 ALPHABETICAL`
             );
           }
 
-          // 驗證套餐子商品列表
+          // 驗證套餐子項目的可選品項列表
           if (category.comboMenuItems !== undefined) {
             if (!Array.isArray(category.comboMenuItems)) {
               throw new Error(
-                `第 ${i + 1} 個套餐分類的 comboMenuItems 必須是陣列`
+                `第 ${i + 1} 個套餐子項目的 comboMenuItems 必須是陣列`
               );
             }
 
@@ -622,17 +622,17 @@ const updateMenuItem: IChefMcpTool = {
                 !uuidRegex.test(comboItem.menuItemUuid)
               ) {
                 throw new Error(
-                  `第 ${i + 1} 個套餐分類的第 ${j + 1} 個子商品的 menuItemUuid 格式不正確`
+                  `第 ${i + 1} 個套餐子項目的第 ${j + 1} 個可選品項的 menuItemUuid 格式不正確`
                 );
               }
 
-              // 驗證子商品 UUID（更新時選填）
+              // 驗證可選品項 UUID（更新時選填）
               if (
                 comboItem.uuid !== undefined &&
                 !uuidRegex.test(comboItem.uuid)
               ) {
                 throw new Error(
-                  `第 ${i + 1} 個套餐分類的第 ${j + 1} 個子商品的 UUID 格式不正確`
+                  `第 ${i + 1} 個套餐子項目的第 ${j + 1} 個可選品項的 UUID 格式不正確`
                 );
               }
 
@@ -640,13 +640,13 @@ const updateMenuItem: IChefMcpTool = {
               if (comboItem.price !== undefined) {
                 if (typeof comboItem.price !== 'string') {
                   throw new Error(
-                    `第 ${i + 1} 個套餐分類的第 ${j + 1} 個子商品的 price 必須是字串格式`
+                    `第 ${i + 1} 個套餐子項目的第 ${j + 1} 個可選品項的 price 必須是字串格式`
                   );
                 }
                 const priceNum = parseFloat(comboItem.price);
                 if (isNaN(priceNum) || priceNum < 0) {
                   throw new Error(
-                    `第 ${i + 1} 個套餐分類的第 ${j + 1} 個子商品的 price 必須是非負數`
+                    `第 ${i + 1} 個套餐子項目的第 ${j + 1} 個可選品項的 price 必須是非負數`
                   );
                 }
               }
@@ -789,35 +789,36 @@ const updateMenuItem: IChefMcpTool = {
       ) {
         errorMessage = '❌ 商品分類不存在或無效，請檢查分類 UUID 是否正確';
       } else if (
-        errorMessage.includes('套餐分類') ||
+        errorMessage.includes('套餐子項目') ||
         errorMessage.includes('comboItemCategories')
       ) {
         errorMessage =
-          '❌ 套餐分類設定錯誤，請檢查分類名稱、選擇規則或子商品設定';
+          '❌ 套餐子項目設定錯誤，請檢查子項目名稱、選擇規則或可選品項設定';
       } else if (
-        errorMessage.includes('套餐商品') ||
+        errorMessage.includes('可選品項') ||
         errorMessage.includes('comboMenuItems')
       ) {
-        errorMessage = '❌ 套餐子商品設定錯誤，請檢查關聯商品 UUID 或加價設定';
+        errorMessage =
+          '❌ 套餐子項目的可選品項設定錯誤，請檢查關聯商品 UUID 或加價設定';
       } else if (
         errorMessage.includes('COMBO_ITEM') ||
         errorMessage.includes('套餐')
       ) {
         errorMessage =
-          '❌ 套餐商品相關錯誤，請檢查商品類型是否為套餐或套餐結構是否正確';
+          '❌ 套餐商品相關錯誤，請檢查商品類型是否為套餐或套餐子項目結構是否正確';
       } else if (
         errorMessage.includes('minimumSelection') ||
         errorMessage.includes('maximumSelection')
       ) {
         errorMessage =
-          '❌ 套餐選擇規則錯誤，請確保最少選擇數量不超過最多選擇數量';
+          '❌ 套餐子項目選擇規則錯誤，請確保最少選擇數量不超過最多選擇數量';
       }
 
       return {
         content: [
           {
             type: 'text',
-            text: `🚨 更新商品時發生錯誤:\n\n${errorMessage}\n\n💡 建議檢查:\n- 商品 UUID 是否存在\n- 商品名稱是否重複\n- 分類 UUID 是否存在\n- 價格是否為正數\n- 商品類型是否正確（套餐功能僅適用於 COMBO_ITEM）\n- 套餐分類選擇規則是否合理（min ≤ max）\n- 關聯的子商品 UUID 是否有效\n- 網路連線是否正常\n- Token 是否有效\n\n原始錯誤: ${error}`,
+            text: `🚨 更新商品時發生錯誤:\n\n${errorMessage}\n\n💡 建議檢查:\n- 商品 UUID 是否存在\n- 商品名稱是否重複\n- 分類 UUID 是否存在\n- 價格是否為正數\n- 商品類型是否正確（套餐功能僅適用於 COMBO_ITEM）\n- 套餐子項目選擇規則是否合理（min ≤ max）\n- 關聯的可選品項 UUID 是否有效\n- 網路連線是否正常\n- Token 是否有效\n\n原始錯誤: ${error}`,
           },
         ],
         isError: true,
