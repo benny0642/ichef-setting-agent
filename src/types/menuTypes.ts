@@ -71,8 +71,8 @@ export interface ItemTagRelationshipType {
   __typename?: string;
 }
 
-// 線上餐廳商品介面
-export interface OnlineRestaurantMenuItem {
+// 線上餐廳商品關聯介面
+export interface OnlineRestaurantMenuItemAssociation {
   uuid: UUID;
   visible?: boolean;
   __typename?: string;
@@ -91,9 +91,9 @@ export interface ComboMenuItem {
   name: string;
   price: number;
   menuItemUuid: UUID;
-  onlineRestaurantMenuItem?: OnlineRestaurantMenuItem;
-  instoreOrderingMenuItem?: OnlineRestaurantMenuItem;
-  ubereatsV2MenuItem?: OnlineRestaurantMenuItem;
+  onlineRestaurantMenuItem?: OnlineRestaurantMenuItemAssociation;
+  instoreOrderingMenuItem?: OnlineRestaurantMenuItemAssociation;
+  ubereatsV2MenuItem?: OnlineRestaurantMenuItemAssociation;
   __typename?: string;
 }
 
@@ -147,11 +147,11 @@ export interface MenuItemType {
   comboItemCategoryUuidsMappedWithOnlineOrdering: {
     ubereats: string;
   };
-  onlineRestaurantMenuItem?: OnlineRestaurantMenuItem;
-  grabfoodMenuItem?: OnlineRestaurantMenuItem;
-  ubereatsMenuItem?: OnlineRestaurantMenuItem;
-  ubereatsV2MenuItem?: OnlineRestaurantMenuItem;
-  foodpandaMenuItem?: OnlineRestaurantMenuItem;
+  onlineRestaurantMenuItem?: OnlineRestaurantMenuItemAssociation;
+  grabfoodMenuItem?: OnlineRestaurantMenuItemAssociation;
+  ubereatsMenuItem?: OnlineRestaurantMenuItemAssociation;
+  ubereatsV2MenuItem?: OnlineRestaurantMenuItemAssociation;
+  foodpandaMenuItem?: OnlineRestaurantMenuItemAssociation;
   itemTagRelationshipList?: ItemTagRelationshipType[];
   __typename?: string;
 }
@@ -306,6 +306,59 @@ export interface AuthValidationResult {
   error?: string;
 }
 
+// 外送菜單分類型別
+export interface OnlineRestaurantMenuCategory {
+  _id: UUID;
+  uuid: UUID;
+  name: string;
+  sortingIndex: number;
+  menuItems: OnlineRestaurantMenuItem[];
+  __typename?: string;
+}
+
+// 外送菜單項目型別
+export interface OnlineRestaurantMenuItem {
+  _id: UUID;
+  uuid: UUID;
+  ichefUuid: UUID;
+  originalName: string;
+  customizedName?: string;
+  originalPrice: number;
+  menuItemType: string;
+  pictureFilename?: string;
+  sortingIndex: number;
+  category: {
+    uuid: UUID;
+    sortingIndex: number;
+    __typename?: string;
+  };
+  menuItem: {
+    isFromHq: boolean;
+    __typename?: string;
+  };
+  __typename?: string;
+}
+
+// 完整菜單結構型別
+export interface OnlineRestaurantMenuStructure {
+  restaurant: {
+    settings: {
+      menu: {
+        integration: {
+          onlineRestaurant: {
+            categories: OnlineRestaurantMenuCategory[];
+            __typename?: string;
+          };
+          __typename?: string;
+        };
+        __typename?: string;
+      };
+      __typename?: string;
+    };
+    __typename?: string;
+  };
+}
+
 // 認證錯誤
 export interface AuthError {
   code: 'INVALID_TOKEN' | 'EXPIRED_TOKEN' | 'MISSING_TOKEN' | 'UNAUTHORIZED';
@@ -428,4 +481,57 @@ export interface BatchDeleteMenuItemResponse {
     };
     __typename?: string;
   };
+}
+
+// 線上餐廳商品匯入相關類型
+export interface OnlineRestaurantMenuItemImportResponse {
+  restaurant: {
+    settings: {
+      menu: {
+        integration: {
+          onlineRestaurant: {
+            importMenuItemToCategory?: Array<{
+              uuid: UUID;
+              name: string;
+              menuItems: Array<{
+                uuid: UUID;
+                ichefUuid: UUID;
+                originalName: string;
+                __typename?: string;
+              }>;
+              __typename?: string;
+            }> | null;
+            __typename?: string;
+          };
+          __typename?: string;
+        };
+        __typename?: string;
+      };
+      __typename?: string;
+    };
+    __typename?: string;
+  };
+}
+
+// 匯入商品參數
+export interface ImportMenuItemArgs {
+  categoryUuid: string;
+  ichefMenuItemUuids: string[];
+}
+
+// 匯入結果統計
+export interface ImportResult {
+  total: number;
+  successful: number;
+  skipped: number;
+  failed: number;
+  successfulItems: string[];
+  skippedItems: Array<{
+    uuid: string;
+    reason: string;
+  }>;
+  failedItems: Array<{
+    uuid: string;
+    error: string;
+  }>;
 }

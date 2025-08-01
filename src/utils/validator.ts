@@ -365,6 +365,94 @@ export const MenuItemValidators = {
   },
 
   /**
+   * 驗證 UUID 格式
+   */
+  validateUuid: (uuid: unknown): ValidationResult => {
+    return validateField(uuid, 'uuid', {
+      required: true,
+      type: 'string',
+      pattern:
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    });
+  },
+
+  /**
+   * 驗證 UUID 陣列
+   */
+  validateUuidArray: (uuids: unknown): ValidationResult => {
+    return validateField(uuids, 'uuidArray', {
+      required: true,
+      type: 'array',
+      custom: (value: unknown) => {
+        if (!Array.isArray(value)) {
+          return 'UUID 陣列必須是陣列格式';
+        }
+        if (value.length === 0) {
+          return 'UUID 陣列不能為空';
+        }
+        if (value.length > 100) {
+          return 'UUID 陣列數量不能超過 100 個';
+        }
+        for (const uuid of value) {
+          if (
+            typeof uuid !== 'string' ||
+            !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+              uuid
+            )
+          ) {
+            return 'UUID 陣列中包含無效的 UUID 格式';
+          }
+        }
+        return true;
+      },
+    });
+  },
+
+  /**
+   * 驗證匯入商品參數
+   */
+  validateImportMenuItemArgs: (
+    data: Record<string, unknown>
+  ): ValidationResult => {
+    const schema = {
+      categoryUuid: {
+        required: true,
+        type: 'string' as const,
+        pattern:
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+      },
+      ichefMenuItemUuids: {
+        required: true,
+        type: 'array' as const,
+        custom: (value: unknown) => {
+          if (!Array.isArray(value)) {
+            return 'ichefMenuItemUuids 必須是陣列格式';
+          }
+          if (value.length === 0) {
+            return 'ichefMenuItemUuids 不能為空，至少需要一個商品 UUID';
+          }
+          if (value.length > 50) {
+            return 'ichefMenuItemUuids 數量不能超過 50 個';
+          }
+          for (const uuid of value) {
+            if (
+              typeof uuid !== 'string' ||
+              !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+                uuid
+              )
+            ) {
+              return 'ichefMenuItemUuids 中包含無效的 UUID 格式';
+            }
+          }
+          return true;
+        },
+      },
+    };
+
+    return validateObject(data, schema);
+  },
+
+  /**
    * 驗證批次操作資料
    */
   validateBatchOperation: (data: Record<string, unknown>): ValidationResult => {

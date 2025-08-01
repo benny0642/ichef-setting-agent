@@ -9,6 +9,9 @@ import {
   MenuItemListingResponse,
   MenuItemTypeEnum,
   MenuItemValidationResult,
+  OnlineRestaurantMenuCategory,
+  OnlineRestaurantMenuItem,
+  OnlineRestaurantMenuItemAssociation,
   UpdateMenuItemPayload,
   UUID,
 } from './menuTypes.js';
@@ -597,5 +600,158 @@ export function isUpdateMenuItemPayload(
   payload: unknown
 ): payload is UpdateMenuItemPayload {
   const validation = validateUpdateMenuItemPayload(payload);
+  return validation.isValid;
+}
+
+/**
+ * 驗證線上餐廳菜單項目
+ */
+export function validateOnlineRestaurantMenuItem(
+  item: unknown
+): MenuItemValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (!item || typeof item !== 'object') {
+    errors.push('線上餐廳菜單項目資料必須是物件');
+    return { isValid: false, errors, warnings };
+  }
+
+  const menuItem = item as Record<string, unknown>;
+
+  // 必填欄位驗證
+  if (!isValidUUID(menuItem.uuid)) {
+    errors.push('線上餐廳菜單項目 UUID 格式無效');
+  }
+
+  if (!isValidUUID(menuItem.ichefUuid)) {
+    errors.push('iChef UUID 格式無效');
+  }
+
+  if (!menuItem.originalName || typeof menuItem.originalName !== 'string') {
+    errors.push('原始名稱是必填欄位且必須是字串');
+  }
+
+  if (
+    typeof menuItem.originalPrice !== 'number' ||
+    menuItem.originalPrice < 0
+  ) {
+    errors.push('原始價格必須是非負數');
+  }
+
+  if (!menuItem.menuItemType || typeof menuItem.menuItemType !== 'string') {
+    errors.push('菜單項目類型是必填欄位且必須是字串');
+  }
+
+  if (typeof menuItem.sortingIndex !== 'number') {
+    errors.push('排序索引必須是數字');
+  }
+
+  // 可選欄位驗證
+  if (
+    menuItem.customizedName !== undefined &&
+    typeof menuItem.customizedName !== 'string'
+  ) {
+    errors.push('自訂名稱必須是字串');
+  }
+
+  if (
+    menuItem.pictureFilename !== undefined &&
+    typeof menuItem.pictureFilename !== 'string'
+  ) {
+    errors.push('圖片檔名必須是字串');
+  }
+
+  // 驗證巢狀物件
+  if (menuItem.category && typeof menuItem.category === 'object') {
+    const category = menuItem.category as Record<string, unknown>;
+    if (!isValidUUID(category.uuid)) {
+      errors.push('分類 UUID 格式無效');
+    }
+    if (typeof category.sortingIndex !== 'number') {
+      errors.push('分類排序索引必須是數字');
+    }
+  } else {
+    errors.push('分類資訊是必填欄位且必須是物件');
+  }
+
+  if (menuItem.menuItem && typeof menuItem.menuItem === 'object') {
+    const menuItemInfo = menuItem.menuItem as Record<string, unknown>;
+    if (typeof menuItemInfo.isFromHq !== 'boolean') {
+      errors.push('總部商品標記必須是布林值');
+    }
+  } else {
+    errors.push('菜單項目資訊是必填欄位且必須是物件');
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings,
+  };
+}
+
+/**
+ * 驗證線上餐廳菜單分類
+ */
+export function validateOnlineRestaurantMenuCategory(
+  category: unknown
+): MenuItemValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (!category || typeof category !== 'object') {
+    errors.push('線上餐廳菜單分類資料必須是物件');
+    return { isValid: false, errors, warnings };
+  }
+
+  const menuCategory = category as Record<string, unknown>;
+
+  // 必填欄位驗證
+  if (!isValidUUID(menuCategory.uuid)) {
+    errors.push('分類 UUID 格式無效');
+  }
+
+  if (!menuCategory.name || typeof menuCategory.name !== 'string') {
+    errors.push('分類名稱是必填欄位且必須是字串');
+  }
+
+  if (typeof menuCategory.sortingIndex !== 'number') {
+    errors.push('排序索引必須是數字');
+  }
+
+  // 驗證菜單項目列表
+  if (menuCategory.menuItems && Array.isArray(menuCategory.menuItems)) {
+    menuCategory.menuItems.forEach((item, index) => {
+      const itemValidation = validateOnlineRestaurantMenuItem(item);
+      if (!itemValidation.isValid) {
+        errors.push(
+          `分類中第 ${index + 1} 個菜單項目驗證失敗: ${itemValidation.errors.join(', ')}`
+        );
+      }
+    });
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings,
+  };
+}
+
+/**
+ * 類型守衛函數
+ */
+export function isOnlineRestaurantMenuItem(
+  item: unknown
+): item is OnlineRestaurantMenuItem {
+  const validation = validateOnlineRestaurantMenuItem(item);
+  return validation.isValid;
+}
+
+export function isOnlineRestaurantMenuCategory(
+  category: unknown
+): category is OnlineRestaurantMenuCategory {
+  const validation = validateOnlineRestaurantMenuCategory(category);
   return validation.isValid;
 }

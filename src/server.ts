@@ -13,6 +13,8 @@ import createMenuItem from './tools/createMenuItem.js';
 import getAllMenuItems from './tools/getAllMenuItems.js';
 import getMenuItemDetails from './tools/getMenuItemDetails.js';
 import getMenuItemTags from './tools/getMenuItemTags.js';
+import getOnlineRestaurantMenuItemListing from './tools/getOnlineRestaurantMenuItemListing.js';
+import importMenuItemToOnlineRestaurant from './tools/importMenuItemToOnlineRestaurant.js';
 import updateMenuItem from './tools/updateMenuItem.js';
 import updateOnlineRestaurantStatus from './tools/updateOnlineRestaurantStatus.js';
 import updateSoldOutMenuItem from './tools/updateSoldOutMenuItem.js';
@@ -57,8 +59,10 @@ const tools = [
   updateSoldOutMenuItem,
   getMenuItemDetails,
   getMenuItemTags,
+  getOnlineRestaurantMenuItemListing,
   updateOnlineRestaurantStatus,
   batchDeleteOnlineRestaurantMenuItems,
+  importMenuItemToOnlineRestaurant,
 ];
 
 // 系統資源列表
@@ -316,6 +320,16 @@ server.setRequestHandler(GetPromptRequestSchema, async request => {
   - sortingIndex: 排序索引
   - picture: 商品圖片 URL
 
+### 3. importMenuItemToOnlineRestaurant
+- **功能**: 批量匯入 iChef 商品到線上餐廳分類
+- **必填參數**:
+  - categoryUuid: 目標線上餐廳分類 UUID
+  - ichefMenuItemUuids: 要匯入的商品 UUID 陣列 (最多 50 項)
+- **特色功能**:
+  - 自動檢查商品狀態（跳過停用商品）
+  - 重複項目偵測
+  - 詳細的匯入統計報告
+
 ## 使用範例
 
 1. 查看所有菜單項目:
@@ -327,6 +341,15 @@ server.setRequestHandler(GetPromptRequestSchema, async request => {
    \`\`\`
    使用 createMenuItem 工具
    參數: {"name": "新商品", "price": 150, "categoryUuid": "分類UUID"}
+   \`\`\`
+
+3. 批量匯入商品到線上餐廳:
+   \`\`\`
+   使用 importMenuItemToOnlineRestaurant 工具
+   參數: {
+     "categoryUuid": "線上餐廳分類UUID",
+     "ichefMenuItemUuids": ["商品1UUID", "商品2UUID", "商品3UUID"]
+   }
    \`\`\`
 
 ## 注意事項
