@@ -158,9 +158,38 @@ const formatMenuItemDetails = (menuItem: MenuItemType): string => {
   if (menuItem.comboItemCategories && menuItem.comboItemCategories.length > 0) {
     result += '🍱 套餐分類:\n';
     menuItem.comboItemCategories.forEach((category, index) => {
-      result += `   ${index + 1}. UUID: ${category.uuid}, 名稱: ${category.name}\n`;
+      result += `   ${index + 1}. 分類名稱: ${category.name}\n`;
+      result += `      - UUID: ${category.uuid}\n`;
+      result += `      - 允許重複選擇: ${category.allowRepeatableSelection ? '✅' : '❌'}\n`;
+      result += `      - 最少選擇數量: ${category.minimumSelection || '無限制'}\n`;
+      result += `      - 最多選擇數量: ${category.maximumSelection || '無限制'}\n`;
+      result += `      - 排序方式: ${category.comboMenuItemSortingType}\n`;
+
+      // 子品項資訊
+      if (category.comboMenuItems && category.comboMenuItems.length > 0) {
+        result += `      - 🔸 子品項 (共 ${category.comboMenuItems.length} 項):\n`;
+        category.comboMenuItems.forEach((comboItem, comboIndex) => {
+          result += `        ${comboIndex + 1}. ${comboItem.name}\n`;
+          result += `           - UUID: ${comboItem.uuid}\n`;
+          result += `           - 價格: $${comboItem.price}\n`;
+          result += `           - 關聯商品 UUID: ${comboItem.menuItemUuid}\n`;
+
+          // 線上訂餐平台可見性
+          if (comboItem.onlineRestaurantMenuItem) {
+            result += `           - 線上訂餐: ${comboItem.onlineRestaurantMenuItem.visible ? '✅ 可見' : '❌ 隱藏'}\n`;
+          }
+          if (comboItem.instoreOrderingMenuItem) {
+            result += `           - 店內點餐: ${comboItem.instoreOrderingMenuItem.visible ? '✅ 可見' : '❌ 隱藏'}\n`;
+          }
+          if (comboItem.ubereatsV2MenuItem) {
+            result += `           - Uber Eats: ${comboItem.ubereatsV2MenuItem.visible ? '✅ 可見' : '❌ 隱藏'}\n`;
+          }
+        });
+      } else {
+        result += `      - 🔸 子品項: 此分類目前沒有設定子品項\n`;
+      }
+      result += '\n';
     });
-    result += '\n';
   }
 
   // 註記資訊
@@ -178,7 +207,7 @@ const isValidUUID = (uuid: string): boolean => {
 };
 
 const getMenuItemDetails: IChefMcpTool = {
-  name: 'get_menu_item_details',
+  name: 'getMenuItemDetails',
   description:
     '取得商品的完整詳細資訊，包含基本資料、註記、註記群組等所有相關資訊',
   inputSchema: {
