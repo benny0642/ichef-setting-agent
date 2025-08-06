@@ -11,6 +11,7 @@ import winston from 'winston';
 import batchDeleteOnlineRestaurantMenuItems from './tools/batchDeleteOnlineRestaurantMenuItems.js';
 import createMenuItem from './tools/createMenuItem.js';
 import createMenuItemCategory from './tools/createMenuItemCategory.js';
+import createOnlineRestaurantMenuCategory from './tools/createOnlineRestaurantMenuCategory.js';
 import deleteMenuItem from './tools/deleteMenuItem.js';
 import getAllMenuItems from './tools/getAllMenuItems.js';
 import getMenuItemDetails from './tools/getMenuItemDetails.js';
@@ -58,6 +59,7 @@ const tools = [
   getAllMenuItems,
   createMenuItem,
   createMenuItemCategory,
+  createOnlineRestaurantMenuCategory,
   deleteMenuItem,
   updateMenuItem,
   updateSoldOutMenuItem,
