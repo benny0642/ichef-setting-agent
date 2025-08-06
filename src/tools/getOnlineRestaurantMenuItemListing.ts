@@ -31,7 +31,13 @@ const formatOnlineRestaurantMenuData = (
     result += `## ${category.name} (分類 ${categoryIndex + 1})\n`;
     result += `- 分類 UUID: ${category.uuid}\n`;
     result += `- 排序索引: ${category.sortingIndex}\n`;
-    result += `- 菜單項目數量: ${category.menuItems.length}\n\n`;
+    result += `- 菜單項目數量: ${category.menuItems.length}\n`;
+    
+    // 顯示菜單時段資訊
+    if (category.menuHoursList && category.menuHoursList.length > 0) {
+      result += `- 菜單時段: ${category.menuHoursList.map(hours => `${hours.name} (${hours.uuid})`).join(', ')}\n`;
+    }
+    result += '\n';
 
     if (category.menuItems.length > 0) {
       // 按照 sortingIndex 排序菜單項目

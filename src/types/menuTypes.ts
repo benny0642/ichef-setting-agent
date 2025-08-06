@@ -306,6 +306,13 @@ export interface AuthValidationResult {
   error?: string;
 }
 
+// 菜單時段類型
+export interface MenuHoursType {
+  uuid: UUID;
+  name: string;
+  __typename?: string;
+}
+
 // 外送菜單分類型別
 export interface OnlineRestaurantMenuCategory {
   _id: UUID;
@@ -313,6 +320,7 @@ export interface OnlineRestaurantMenuCategory {
   name: string;
   sortingIndex: number;
   menuItems: OnlineRestaurantMenuItem[];
+  menuHoursList?: MenuHoursType[];
   __typename?: string;
 }
 

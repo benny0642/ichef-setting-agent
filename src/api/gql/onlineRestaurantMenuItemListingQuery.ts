@@ -15,6 +15,10 @@ export const ONLINE_RESTAURANT_MENU_ITEM_LISTING_QUERY = gql`
                 menuItems {
                   ...onlineRestaurantMenuItemItemListingFragment
                 }
+                menuHoursList {
+                  uuid
+                  name
+                }
                 __typename
               }
               __typename

@@ -4,4 +4,7 @@ build/
 schema.json
 src/types/generated.ts
 .DS_Store
+.cursorrules/
+.cursor/
+.vscode/
 ichef-setting-agent.dxt
