@@ -9,6 +9,14 @@ export const MENU_ITEM_CREATE_MUTATION = gql`
             uuid
             name
             type
+            menuItemTagUuids
+            menuItemTags {
+              uuid
+              name
+              type
+              price
+              enabled
+            }
             comboItemCategories {
               ...comboItemCategoryFields
             }

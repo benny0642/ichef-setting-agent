@@ -3,6 +3,7 @@ import { createGraphQLClient } from '../api/graphqlClient.js';
 import { IChefMcpTool, McpToolResponse } from '../types/mcpTypes.js';
 import {
   ComboItemCategoryInput,
+  ItemTagRelationshipPayload,
   MenuItemCreateResponse,
 } from '../types/menuTypes.js';
 
@@ -19,6 +20,7 @@ interface CreateMenuItemArgs {
   customizedTaxEnabled?: boolean;
   customizedTaxType?: string;
   customizedTaxRate?: number;
+  itemTagRelationshipList?: ItemTagRelationshipPayload[];
   comboItemCategories?: ComboItemCategoryInput[];
 }
 
@@ -59,6 +61,31 @@ const formatCreateSuccessResponse = (
     }
   }
 
+  // 顯示註記資訊
+  if (newItem.menuItemTags && newItem.menuItemTags.length > 0) {
+    result += `🏷️ 商品註記 (${newItem.menuItemTags.length} 個):\n`;
+    newItem.menuItemTags.forEach((tag, index) => {
+      result += `   ${index + 1}. ${tag.name} (${tag.uuid})\n`;
+      if (tag.price && parseFloat(tag.price.toString()) > 0) {
+        result += `      加價: $${tag.price}\n`;
+      }
+    });
+  } else if (args.itemTagRelationshipList && args.itemTagRelationshipList.length > 0) {
+    result += `🏷️ 商品註記關聯 (${args.itemTagRelationshipList.length} 個):\n`;
+    args.itemTagRelationshipList.forEach((relationship, index) => {
+      result += `   ${index + 1}. `;
+      if (relationship.menuItemTagUuid) {
+        result += `註記 UUID: ${relationship.menuItemTagUuid}`;
+      } else if (relationship.tagGroupUuid) {
+        result += `註記群組 UUID: ${relationship.tagGroupUuid}`;
+        if (relationship.subTagList && relationship.subTagList.length > 0) {
+          result += ` (${relationship.subTagList.length} 個子註記)`;
+        }
+      }
+      result += '\n';
+    });
+  }
+
   // 如果是套餐商品，顯示套餐結構
   if (args.type === 'combo' && newItem.comboItemCategories) {
     result += '\n📋 套餐結構:\n';
@@ -83,7 +110,7 @@ const formatCreateSuccessResponse = (
 
 const createMenuItem: IChefMcpTool = {
   name: 'createMenuItem',
-  description: '新增一個新的菜單商品項目，支援完整的商品資訊設定',
+  description: '新增一個新的菜單商品項目，支援完整的商品資訊設定，包括商品註記（menuTag）',
   category: 'menu',
   version: '1.0.0',
   inputSchema: {
@@ -144,6 +171,53 @@ const createMenuItem: IChefMcpTool = {
         description: '自訂稅率（選填，百分比）',
         minimum: 0,
         maximum: 100,
+      },
+      itemTagRelationshipList: {
+        type: 'array',
+        description: '商品註記列表（選填）',
+        items: {
+          type: 'object',
+          properties: {
+            followingSeparatorCount: {
+              type: 'number',
+              description: '分隔符數量',
+              minimum: 0,
+            },
+            menuItemTagUuid: {
+              type: 'string',
+              description: '商品標籤 UUID（與 tagGroupUuid 二選一）',
+              pattern:
+                '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+            },
+            tagGroupUuid: {
+              type: 'string',
+              description: '標籤群組 UUID（與 menuItemTagUuid 二選一）',
+              pattern:
+                '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+            },
+            subTagList: {
+              type: 'array',
+              description: '子標籤列表（僅在使用 tagGroupUuid 時需要）',
+              items: {
+                type: 'object',
+                properties: {
+                  enabled: {
+                    type: 'boolean',
+                    description: '是否啟用此子標籤',
+                  },
+                  subTagUuid: {
+                    type: 'string',
+                    description: '子標籤 UUID',
+                    pattern:
+                      '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+                  },
+                },
+                required: ['subTagUuid'],
+              },
+            },
+          },
+        },
+        maxItems: 50,
       },
       comboItemCategories: {
         type: 'array',
@@ -369,6 +443,79 @@ const createMenuItem: IChefMcpTool = {
         }
       }
 
+      // 驗證商品註記
+      if (createArgs.itemTagRelationshipList !== undefined) {
+        if (!Array.isArray(createArgs.itemTagRelationshipList)) {
+          throw new Error('商品註記列表必須是陣列');
+        }
+
+        for (let i = 0; i < createArgs.itemTagRelationshipList.length; i++) {
+          const relationship = createArgs.itemTagRelationshipList[i];
+
+          // 驗證必須有 menuItemTagUuid 或 tagGroupUuid 其中之一
+          if (!relationship.menuItemTagUuid && !relationship.tagGroupUuid) {
+            throw new Error(
+              `第 ${i + 1} 個註記必須指定 menuItemTagUuid 或 tagGroupUuid`
+            );
+          }
+
+          // 驗證不能同時有 menuItemTagUuid 和 tagGroupUuid
+          if (relationship.menuItemTagUuid && relationship.tagGroupUuid) {
+            throw new Error(
+              `第 ${i + 1} 個註記不能同時指定 menuItemTagUuid 和 tagGroupUuid`
+            );
+          }
+
+          // 驗證 UUID 格式
+          if (
+            relationship.menuItemTagUuid &&
+            !uuidRegex.test(relationship.menuItemTagUuid)
+          ) {
+            throw new Error(`第 ${i + 1} 個註記的 menuItemTagUuid 格式不正確`);
+          }
+
+          if (
+            relationship.tagGroupUuid &&
+            !uuidRegex.test(relationship.tagGroupUuid)
+          ) {
+            throw new Error(`第 ${i + 1} 個註記的 tagGroupUuid 格式不正確`);
+          }
+
+          // 驗證分隔符數量
+          if (relationship.followingSeparatorCount !== undefined) {
+            if (
+              typeof relationship.followingSeparatorCount !== 'number' ||
+              relationship.followingSeparatorCount < 0
+            ) {
+              throw new Error(`第 ${i + 1} 個註記的分隔符數量必須是非負數`);
+            }
+          }
+
+          // 驗證子標籤列表
+          if (relationship.subTagList !== undefined) {
+            if (!Array.isArray(relationship.subTagList)) {
+              throw new Error(`第 ${i + 1} 個註記的子標籤列表必須是陣列`);
+            }
+
+            for (let j = 0; j < relationship.subTagList.length; j++) {
+              const subTag = relationship.subTagList[j];
+
+              if (typeof subTag.enabled !== 'boolean') {
+                throw new Error(
+                  `第 ${i + 1} 個註記的第 ${j + 1} 個子標籤的 enabled 必須是布林值`
+                );
+              }
+
+              if (!subTag.subTagUuid || !uuidRegex.test(subTag.subTagUuid)) {
+                throw new Error(
+                  `第 ${i + 1} 個註記的第 ${j + 1} 個子標籤的 subTagUuid 格式不正確`
+                );
+              }
+            }
+          }
+        }
+      }
+
       // 構建 GraphQL mutation payload
       const payload: Record<string, unknown> = {
         name: createArgs.name.trim(),
@@ -389,6 +536,9 @@ const createMenuItem: IChefMcpTool = {
         }),
         ...(createArgs.customizedTaxRate !== undefined && {
           customizedTaxRate: createArgs.customizedTaxRate.toString(),
+        }),
+        ...(createArgs.itemTagRelationshipList && {
+          itemTagRelationshipList: createArgs.itemTagRelationshipList,
         }),
       };
 
