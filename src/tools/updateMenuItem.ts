@@ -123,12 +123,6 @@ const formatUpdateSuccessResponse = (
       updatedFields.push(`   套餐子項目詳情:`);
       args.comboItemCategories.forEach((category, index) => {
         updatedFields.push(`     📂 子項目 ${index + 1}: ${category.name}`);
-        updatedFields.push(
-          `        ├─ 選擇規則: 最少 ${category.minimumSelection} 項，最多 ${category.maximumSelection} 項`
-        );
-        updatedFields.push(
-          `        ├─ 重複選擇: ${category.allowRepeatableSelection ? '允許' : '不允許'}`
-        );
 
         if (category.comboMenuItemSortingType) {
           updatedFields.push(
@@ -301,20 +295,6 @@ const updateMenuItem: IChefMcpTool = {
               minLength: 1,
               maxLength: 255,
             },
-            allowRepeatableSelection: {
-              type: 'boolean',
-              description: '是否允許重複選擇（必填）',
-            },
-            minimumSelection: {
-              type: 'number',
-              description: '最少選擇數量（必填）',
-              minimum: 0,
-            },
-            maximumSelection: {
-              type: 'number',
-              description: '最多選擇數量（必填）',
-              minimum: 0,
-            },
             comboMenuItemSortingType: {
               type: 'string',
               enum: ['MANUAL', 'ALPHABETICAL'],
@@ -350,9 +330,6 @@ const updateMenuItem: IChefMcpTool = {
           },
           required: [
             'name',
-            'allowRepeatableSelection',
-            'minimumSelection',
-            'maximumSelection',
           ],
         },
       },
@@ -559,37 +536,7 @@ const updateMenuItem: IChefMcpTool = {
             throw new Error(`第 ${i + 1} 個套餐子項目的 UUID 格式不正確`);
           }
 
-          // 驗證必填布林值
-          if (typeof category.allowRepeatableSelection !== 'boolean') {
-            throw new Error(
-              `第 ${i + 1} 個套餐子項目的 allowRepeatableSelection 必須是布林值`
-            );
-          }
 
-          // 驗證選擇數量
-          if (
-            typeof category.minimumSelection !== 'number' ||
-            category.minimumSelection < 0
-          ) {
-            throw new Error(
-              `第 ${i + 1} 個套餐子項目的 minimumSelection 必須是非負整數`
-            );
-          }
-
-          if (
-            typeof category.maximumSelection !== 'number' ||
-            category.maximumSelection < 0
-          ) {
-            throw new Error(
-              `第 ${i + 1} 個套餐子項目的 maximumSelection 必須是非負整數`
-            );
-          }
-
-          if (category.minimumSelection > category.maximumSelection) {
-            throw new Error(
-              `第 ${i + 1} 個套餐子項目的 minimumSelection 不能大於 maximumSelection`
-            );
-          }
 
           // 驗證排序類型（選填）
           if (
@@ -705,7 +652,12 @@ const updateMenuItem: IChefMcpTool = {
       }
 
       if (updateArgs.comboItemCategories !== undefined) {
-        payload.comboItemCategories = updateArgs.comboItemCategories;
+        payload.comboItemCategories = updateArgs.comboItemCategories.map(category => ({
+          ...category,
+          allowRepeatableSelection: false,
+          minimumSelection: 1,
+          maximumSelection: 1,
+        }));
       }
 
       // 建立 GraphQL 客戶端
@@ -804,12 +756,6 @@ const updateMenuItem: IChefMcpTool = {
       ) {
         errorMessage =
           '❌ 套餐商品相關錯誤，請檢查商品類型是否為套餐或套餐子項目結構是否正確';
-      } else if (
-        errorMessage.includes('minimumSelection') ||
-        errorMessage.includes('maximumSelection')
-      ) {
-        errorMessage =
-          '❌ 套餐子項目選擇規則錯誤，請確保最少選擇數量不超過最多選擇數量';
       }
 
       return {

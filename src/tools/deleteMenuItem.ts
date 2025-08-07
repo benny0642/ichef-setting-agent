@@ -61,8 +61,6 @@ const formatDeleteSuccessResponse = (
     result += '\n📋 已刪除的套餐結構:\n';
     deletedItem.comboItemCategories.forEach((category, categoryIndex) => {
       result += `\n📂 分類 ${categoryIndex + 1}: ${category.name}\n`;
-      result += `   ├─ 選擇規則: 最少 ${category.minimumSelection || 1} 項，最多 ${category.maximumSelection || 1} 項\n`;
-      result += `   ├─ 可重複選擇: ${category.allowRepeatableSelection ? '是' : '否'}\n`;
       result += `   └─ 商品選項 (${category.comboMenuItems.length} 項):\n`;
 
       category.comboMenuItems.forEach((item, itemIndex) => {
