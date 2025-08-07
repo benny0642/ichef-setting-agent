@@ -160,9 +160,6 @@ const formatMenuItemDetails = (menuItem: MenuItemType): string => {
     menuItem.comboItemCategories.forEach((category, index) => {
       result += `   ${index + 1}. 分類名稱: ${category.name}\n`;
       result += `      - UUID: ${category.uuid}\n`;
-      result += `      - 允許重複選擇: ${category.allowRepeatableSelection ? '✅' : '❌'}\n`;
-      result += `      - 最少選擇數量: ${category.minimumSelection || '無限制'}\n`;
-      result += `      - 最多選擇數量: ${category.maximumSelection || '無限制'}\n`;
       result += `      - 排序方式: ${category.comboMenuItemSortingType}\n`;
 
       // 子品項資訊

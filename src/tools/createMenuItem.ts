@@ -91,8 +91,6 @@ const formatCreateSuccessResponse = (
     result += '\n📋 套餐結構:\n';
     newItem.comboItemCategories.forEach((category, categoryIndex) => {
       result += `\n📂 分類 ${categoryIndex + 1}: ${category.name}\n`;
-      result += `   ├─ 選擇規則: 最少 ${category.minimumSelection || 1} 項，最多 ${category.maximumSelection || 1} 項\n`;
-      result += `   ├─ 可重複選擇: ${category.allowRepeatableSelection ? '是' : '否'}\n`;
       result += `   └─ 商品選項 (${category.comboMenuItems.length} 項):\n`;
 
       category.comboMenuItems.forEach((item, itemIndex) => {
@@ -231,23 +229,6 @@ const createMenuItem: IChefMcpTool = {
               minLength: 1,
               maxLength: 255,
             },
-            allowRepeatableSelection: {
-              type: 'boolean',
-              description: '是否允許重複選擇（選填，預設為 false）',
-              default: false,
-            },
-            minimumSelection: {
-              type: 'number',
-              description: '最少選擇數量（選填，預設為 1）',
-              minimum: 0,
-              default: 1,
-            },
-            maximumSelection: {
-              type: 'number',
-              description: '最多選擇數量（選填，預設為 1）',
-              minimum: 1,
-              default: 1,
-            },
             comboMenuItems: {
               type: 'array',
               description: '套餐選項（必填）',
@@ -346,33 +327,6 @@ const createMenuItem: IChefMcpTool = {
             );
           }
 
-          // 驗證選擇數量設定
-          const minSelection =
-            category.minimumSelection !== undefined
-              ? category.minimumSelection
-              : 1;
-          const maxSelection =
-            category.maximumSelection !== undefined
-              ? category.maximumSelection
-              : 1;
-
-          if (minSelection < 0) {
-            throw new Error(
-              `第 ${categoryIndex + 1} 個分類的最少選擇數量不能小於 0`
-            );
-          }
-
-          if (maxSelection < 1) {
-            throw new Error(
-              `第 ${categoryIndex + 1} 個分類的最多選擇數量不能小於 1`
-            );
-          }
-
-          if (maxSelection < minSelection) {
-            throw new Error(
-              `第 ${categoryIndex + 1} 個分類的最多選擇數量不能小於最少選擇數量`
-            );
-          }
 
           // 驗證套餐選項
           if (
@@ -547,10 +501,9 @@ const createMenuItem: IChefMcpTool = {
         payload.comboItemCategories = createArgs.comboItemCategories.map(
           category => ({
             name: category.name.trim(),
-            allowRepeatableSelection:
-              category.allowRepeatableSelection || false,
-            minimumSelection: category.minimumSelection || 1,
-            maximumSelection: category.maximumSelection || 1,
+            allowRepeatableSelection: false,
+            minimumSelection: 1,
+            maximumSelection: 1,
             comboMenuItemSortingType: 'DEFAULT',
             comboMenuItems: (category.comboMenuItems || []).map(item => ({
               menuItemUuid: item.menuItemUuid,
