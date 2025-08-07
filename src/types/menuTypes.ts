@@ -193,6 +193,8 @@ export interface MenuItemCreateResponse {
           uuid: UUID;
           name: string;
           type: MenuItemTypeEnum;
+          menuItemTagUuids?: string[];
+          menuItemTags?: MenuItemTagType[];
           comboItemCategories?: ComboItemCategoryType[];
           __typename?: string;
         };
@@ -270,6 +272,8 @@ export interface CreateMenuItemPayload {
   customizedTaxType?: CustomizedTaxType;
   customizedTaxRate?: number;
   itemTagRelationshipList?: ItemTagRelationshipPayload[];
+  menuItemTagUuids?: string[]; // 商品註記 UUID 陣列
+  menuItemTagSortingType?: string; // 註記排序類型
   comboItemCategories?: ComboItemCategoryInput[];
 }
 
